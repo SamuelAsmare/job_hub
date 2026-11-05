@@ -72,125 +72,21 @@ Companies and individuals looking for qualified employees. They need to publish 
 
 ### Four main screen sketches
 
-**A. Job Seeker Home**
+**A. Welcome**
 
-```text
-┌──────────────────────────────┐
-│ JobHub                 🔔    │
-│ Hello, Job Seeker!            │
-│                              │
-│ ┌──────────────────────────┐ │
-│ │ Search jobs...       🔍  │ │
-│ └──────────────────────────┘ │
-│                              │
-│ Recommended Jobs             │
-│ ┌──────────────────────────┐ │
-│ │ Software Developer       │ │
-│ │ Company: ABC             │ │
-│ │ Addis Ababa              │ │
-│ │ [View Details]           │ │
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ UI/UX Designer           │ │
-│ │ Company: XYZ             │ │
-│ │ [View Details]           │ │
-│ └──────────────────────────┘ │
-│                              │
-│ Home  Search  Saved  Profile │
-└──────────────────────────────┘
-```
+![ Welcome ](assets/images/welcome.png)
 
-**B. Job Details**
+**B. Sign Up**
 
-```text
-┌──────────────────────────────┐
-│ ← Job Details                │
-│                              │
-│ Software Developer           │
-│ ABC Technologies             │
-│ Addis Ababa                  │
-│                              │
-│ Job Description              │
-│ Develop and maintain         │
-│ software applications...     │
-│                              │
-│ Requirements                 │
-│ • Programming skills         │
-│ • Database knowledge         │
-│ • Problem solving            │
-│                              │
-│ [AI Summary]                 │
-│                              │
-│ [Save Job]                   │
-│ [Apply Now]                  │
-└──────────────────────────────┘
-```
+![Sign Up](assets/images/register.png)
 
-**C. Job Application**
+**C. Register Company**
 
-```text
-┌──────────────────────────────┐
-│ ← Apply for Job              │
-│                              │
-│ Software Developer           │
-│ ABC Technologies             │
-│                              │
-│ My Saved CV                  │
-│ 📄 My_CV.pdf       [Attached]│
-│                              │
-│ Cover Letter *               │
-│ ┌──────────────────────────┐ │
-│ │ Write a cover letter for │ │
-│ │ this specific job...     │ │
-│ └──────────────────────────┘ │
-│                              │
-│ * Required for every job     │
-│                              │
-│       [Submit Application]   │
-└──────────────────────────────┘
-```
+![Company](assets/images/register_company.png)
 
-**D. Employer Dashboard and Vacancy Details**
+**D. Login to exising profile**
 
-```text
-┌──────────────────────────────┐
-│ JobHub Employer         🔔   │
-│ Welcome, Employer!           │
-│                              │
-│ Recruitment Overview         │
-│ ┌──────────┐ ┌────────────┐  │
-│ │ 5 Jobs   │ │ 24 Applied │  │
-│ └──────────┘ └────────────┘  │
-│                              │
-│ Your Job Vacancies           │
-│ ┌──────────────────────────┐ │
-│ │ Software Developer       │ │
-│ │ Applicants: 12           │ │
-│ │ [View Details]           │ │
-│ └──────────────────────────┘ │
-│ ┌──────────────────────────┐ │
-│ │ UI/UX Designer           │ │
-│ │ Applicants: 8            │ │
-│ │ [View Details]           │ │
-│ └──────────────────────────┘ │
-│                              │
-│ [ + Post New Job ]           │
-│ Dashboard  Jobs  Messages    │
-└──────────────────────────────┘
-
-       Selected vacancy
-
-┌──────────────────────────────┐
-│ ← Vacancy Details            │
-│ Software Developer           │
-│ ABC Technologies             │
-│ Applicants: 12               │
-│                              │
-│ [View Applicants]            │
-│ [Edit Vacancy]               │
-│ [Delete Vacancy]             │
-└──────────────────────────────┘
-```
+![Login](assets/images/signin.png)
 
 ## 7. Data model
 
