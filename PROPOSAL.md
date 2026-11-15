@@ -23,7 +23,9 @@ JobHub addresses these challenges by providing a centralized mobile platform whe
 
 A mobile application is appropriate because job seekers and employers can access the platform from their smartphones, receive notifications and communicate without depending on a desktop computer.
 
-**Potential user validation:** [Insert the name of one real job seeker or employer interviewed by the group and briefly describe the difficulty they experienced and what the group learned. This must be completed before submission.]
+Dagim Abiyu, an Information Science student, shared that finding relevant job opportunities is difficult because vacancies are often scattered across different social media platforms and websites. He also experiences challenges understanding job requirements and keeping track of application opportunities. From this feedback, the group learned that job seekers need a centralized platform where they can easily discover suitable vacancies, understand job requirements, and manage their applications in one place.
+
+Daniel Anteneh, a Management student, shared that finding suitable job opportunities is challenging because vacancies are published across different platforms, making them difficult to discover and compare. He also highlighted the difficulty of keeping track of available opportunities and application processes. From this feedback, the group learned that job seekers need a centralized platform like JobHub to easily discover relevant vacancies, compare opportunities, and manage their job applications in one place.
 
 ## 4. Users
 
