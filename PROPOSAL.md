@@ -172,7 +172,7 @@ JobHub will provide an AI-generated summary of lengthy job descriptions, highlig
 
 ## 11. Milestone plan
 
-**Milestone 1 – Week 6: UI and navigation**
+**Milestone 1 – Week 7: UI and navigation**
 
 - US1: Registration, login and role-based navigation screens.
 - US2: Job browsing, searching and filtering screens.
