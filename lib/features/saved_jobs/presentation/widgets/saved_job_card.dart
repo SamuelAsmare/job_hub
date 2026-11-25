@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../domain/models/saved_job.dart';
-import '../providers/saved_job_provider.dart';
 
 class SavedJobCard extends StatelessWidget {
   const SavedJobCard({
     super.key,
     required this.savedJob,
-    required this.jobSummary,
     required this.onRemove,
     this.onTap,
   });
 
   final SavedJob savedJob;
-  final JobSummary? jobSummary;
   final VoidCallback onRemove;
   final VoidCallback? onTap;
 
@@ -26,12 +23,6 @@ class SavedJobCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final title = jobSummary?.title ?? 'Position #${savedJob.jobId}';
-    final company = jobSummary?.company ?? 'Employer Details Pending';
-    final location = jobSummary?.location ?? 'Location not specified';
-    final salary = jobSummary?.salary ?? 'Competitive Salary';
-    final type = jobSummary?.type ?? 'Full-time';
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -77,7 +68,7 @@ class SavedJobCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            title,
+                            'Job Reference #${savedJob.jobId}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -86,9 +77,9 @@ class SavedJobCard extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 4),
-                          Text(
-                            company,
-                            style: const TextStyle(
+                          const Text(
+                            'Saved Position',
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
                               color: secondaryText,
@@ -113,8 +104,8 @@ class SavedJobCard extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 6,
                   children: [
-                    _buildPill(icon: Icons.location_on_outlined, label: location),
-                    _buildPill(icon: Icons.schedule_rounded, label: type),
+                    _buildPill(icon: Icons.tag_rounded, label: savedJob.jobId),
+                    _buildPill(icon: Icons.bookmark_added_outlined, label: 'Bookmarked'),
                   ],
                 ),
                 const SizedBox(height: 14),
@@ -124,11 +115,11 @@ class SavedJobCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      salary,
+                      'ID: ${savedJob.id}',
                       style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: primaryBlue,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: mutedText,
                       ),
                     ),
                     Text(

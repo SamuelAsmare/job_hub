@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/saved_job_provider.dart';
 import '../widgets/saved_job_card.dart';
-import '../widgets/saved_jobs_empty_state.dart';
 
 /// The Saved Jobs screen where job-seekers can view and manage their bookmarked jobs.
 ///
@@ -54,11 +53,7 @@ class SavedJobsScreen extends ConsumerWidget {
                   error: (error, stack) => _buildErrorState(context, ref, error),
                   data: (savedJobs) {
                     if (savedJobs.isEmpty) {
-                      return SavedJobsEmptyState(
-                        onExplorePressed: () {
-                          Navigator.of(context).maybePop();
-                        },
-                      );
+                      return _buildEmptyState(context);
                     }
 
                     return RefreshIndicator(
@@ -77,14 +72,10 @@ class SavedJobsScreen extends ConsumerWidget {
                             const SizedBox(height: 14),
                         itemBuilder: (context, index) {
                           final savedJob = savedJobs[index];
-                          final summary = ref.watch(
-                            jobDetailsResolverProvider(savedJob.jobId),
-                          );
 
                           return SavedJobCard(
                             key: ValueKey(savedJob.id),
                             savedJob: savedJob,
-                            jobSummary: summary,
                             onRemove: () async {
                               await ref
                                   .read(savedJobsProvider.notifier)
@@ -187,6 +178,77 @@ class SavedJobsScreen extends ConsumerWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyState(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                color: paleBlueBackground,
+                shape: BoxShape.circle,
+                border: Border.all(color: inputBorder, width: 1.5),
+              ),
+              child: const Icon(
+                Icons.bookmark_border_rounded,
+                color: primaryBlue,
+                size: 38,
+              ),
+            ),
+            const SizedBox(height: 24),
+            const Text(
+              'No Saved Jobs Yet',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: primaryNavy,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Bookmark job openings while browsing to keep track of opportunities and apply whenever you are ready.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: secondaryText,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              height: 46,
+              child: ElevatedButton.icon(
+                onPressed: () => Navigator.of(context).maybePop(),
+                icon: const Icon(Icons.search_rounded, size: 18),
+                label: const Text(
+                  'Explore Jobs',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryBlue,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
