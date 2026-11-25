@@ -1,2 +1,25 @@
+# Environment variables and secrets
 .env
-pubspec.yaml
+.env.*
+
+# Dart and Flutter generated files
+.dart_tool/
+.packages
+.pub/
+.flutter-plugins
+.flutter-plugins-dependencies
+build/
+
+# IDE files
+.idea/
+*.iml
+
+# Android generated files
+android/.gradle/
+android/.kotlin/
+android/local.properties
+android/key.properties
+
+# Operating system files
+.DS_Store
+Thumbs.db
