@@ -309,8 +309,10 @@ class SettingsScreen extends ConsumerWidget {
           ),
         ],
       ),
-      child: ClipRRect(
+      child: Material(
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
         child: Column(
           children: children,
         ),
