@@ -1,0 +1,66 @@
+import '../../domain/models/job.dart';
+
+final List<Job> sampleJobs = [
+  Job(
+    id: 'job_001',
+    title: 'Senior Flutter Developer',
+    companyName: 'TechCorp Solutions',
+    companyLogo: null,
+    location: 'Addis Ababa, Ethiopia',
+    description:
+        'Lead mobile development team building enterprise Flutter applications.',
+    requirements: [
+      '3+ years Flutter experience',
+      'Riverpod state management',
+      'Clean Architecture',
+    ],
+    employmentType: 'Full-time',
+    salary: r'$3,000 - $4,500 / month',
+    postedAt: DateTime(2026, 11, 15),
+    deadline: DateTime(2026, 12, 15),
+    employerId: 'emp_001',
+    latitude: 8.995,
+    longitude: 38.787,
+  ),
+  Job(
+    id: 'job_002',
+    title: 'Mobile UI/UX Designer',
+    companyName: 'Creative Hive Studio',
+    companyLogo: null,
+    location: 'Remote',
+    description:
+        'Design contemporary mobile product experiences and user flows.',
+    requirements: [
+      'Figma mastery',
+      'Mobile design systems',
+      'Prototyping',
+    ],
+    employmentType: 'Full-time',
+    salary: r'$2,500 - $3,500 / month',
+    postedAt: DateTime(2026, 11, 18),
+    deadline: DateTime(2026, 12, 18),
+    employerId: 'emp_002',
+    latitude: null,
+    longitude: null,
+  ),
+  Job(
+    id: 'job_003',
+    title: 'Backend Engineer (Dart / Go)',
+    companyName: 'CloudScale Systems',
+    companyLogo: null,
+    location: 'Addis Ababa (Hybrid)',
+    description: 'Design and deploy scalable microservices and APIs.',
+    requirements: [
+      'Dart/Go experience',
+      'PostgreSQL',
+      'Docker',
+    ],
+    employmentType: 'Full-time',
+    salary: r'$2,800 - $4,000 / month',
+    postedAt: DateTime(2026, 11, 20),
+    deadline: DateTime(2026, 12, 20),
+    employerId: 'emp_003',
+    latitude: 9.010,
+    longitude: 38.766,
+  ),
+];
