@@ -2,9 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/applications/presentation/screens/apply_job_screen.dart';
+import '../../features/applications/presentation/screens/my_applications_screen.dart';
+import '../../features/jobs/presentation/providers/job_provider.dart';
+import '../../features/jobs/presentation/screens/job_details_screen.dart';
+import '../../features/jobs/presentation/screens/job_search_screen.dart';
+import '../../features/jobs/presentation/screens/job_seeker_home_screen.dart';
+import '../../features/jobs/presentation/screens/nearby_jobs_map_screen.dart';
+import '../../features/messaging/presentation/screens/messages_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/saved_jobs/presentation/screens/saved_jobs_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
+
 import '../constants/app_constants.dart';
 import '../providers/app_providers.dart';
 import '../theme/app_colors.dart';
@@ -13,18 +22,19 @@ import '../widgets/app_button.dart';
 import '../widgets/empty_state_widget.dart';
 import 'route_names.dart';
 
-/// Listens to Riverpod session changes so [GoRouter] re-evaluates redirects
-/// without recreating the router instance.
+/// Refreshes GoRouter when the application session changes.
 class _RouterRefreshNotifier extends ChangeNotifier {
   void triggerRefresh() => notifyListeners();
 }
 
-/// Global [GoRouter] provider wired into [MaterialApp.router].
+/// Global GoRouter provider.
 final appRouterProvider = Provider<GoRouter>((ref) {
   final refreshNotifier = _RouterRefreshNotifier();
+
   ref.listen<AppSessionState>(appSessionProvider, (previous, next) {
     refreshNotifier.triggerRefresh();
   });
+
   ref.onDispose(refreshNotifier.dispose);
 
   return createAppRouter(
@@ -33,12 +43,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
   );
 });
 
-/// Default standalone router instance for simple references or quick previews.
+/// Standalone router instance.
 final GoRouter appRouter = createAppRouter(
   readSession: () => const AppSessionState.sampleJobSeeker(),
 );
 
-/// Builds the application [GoRouter] with role-based redirects and all routes.
+/// Creates the application router.
 GoRouter createAppRouter({
   required AppSessionState Function() readSession,
   Listenable? refreshListenable,
@@ -64,6 +74,7 @@ GoRouter createAppRouter({
       if (session.isAuthenticated) {
         final isEmployerRoute = location == RouteNames.employerDashboard ||
             location.startsWith('${RouteNames.employerDashboard}/');
+
         if (isEmployerRoute && session.role != UserRole.employer) {
           return RouteNames.jobSeekerHome;
         }
@@ -73,7 +84,9 @@ GoRouter createAppRouter({
             location == RouteNames.savedJobs ||
             location == RouteNames.jobSeekerProfile ||
             location == RouteNames.myCv ||
+            location == RouteNames.nearbyJobsMap ||
             location.endsWith('/apply');
+
         if (isJobSeekerOnlyRoute && session.role != UserRole.jobSeeker) {
           return RouteNames.employerDashboard;
         }
@@ -82,186 +95,253 @@ GoRouter createAppRouter({
       return null;
     },
     routes: [
-      // Integration Hub / Entry
+      // --------------------------------------------------
+      // Integration Hub
+      // --------------------------------------------------
       GoRoute(
         path: RouteNames.home,
         name: RouteNames.homeName,
         builder: (context, state) => const _IntegrationHubScreen(),
       ),
 
-      // Authentication routes (replace with WelcomeScreen & AuthScreen once ready)
+      // --------------------------------------------------
+      // Authentication (pending)
+      // --------------------------------------------------
       GoRoute(
         path: RouteNames.welcome,
         name: RouteNames.welcomeName,
         builder: (context, state) => const _PendingFeatureScreen(
           title: 'Welcome',
-          featurePath: 'lib/features/authentication/presentation/screens/welcome_screen.dart',
+          featurePath:
+              'lib/features/authentication/presentation/screens/welcome_screen.dart',
           routePath: RouteNames.welcome,
           description:
               'Introduces JobHub and provides navigation to login and registration.',
         ),
       ),
+
       GoRoute(
         path: RouteNames.auth,
         name: RouteNames.authName,
         builder: (context, state) => const _PendingFeatureScreen(
           title: 'Login & Registration',
-          featurePath: 'lib/features/authentication/presentation/screens/auth_screen.dart',
+          featurePath:
+              'lib/features/authentication/presentation/screens/auth_screen.dart',
           routePath: RouteNames.auth,
           description:
               'Authenticates job seekers and employers and sets their role.',
         ),
       ),
 
-      // Job Seeker routes
+      // --------------------------------------------------
+      // Job Seeker (submitted)
+      // --------------------------------------------------
       GoRoute(
         path: RouteNames.jobSeekerHome,
         name: RouteNames.jobSeekerHomeName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Job Seeker Home',
-          featurePath: 'lib/features/jobs/presentation/screens/job_seeker_home_screen.dart',
-          routePath: RouteNames.jobSeekerHome,
-          description: 'Displays recent and recommended job vacancies.',
-        ),
+        builder: (context, state) => const JobSeekerHomeScreen(),
       ),
+
       GoRoute(
         path: RouteNames.jobSearch,
         name: RouteNames.jobSearchName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Job Search',
-          featurePath: 'lib/features/jobs/presentation/screens/job_search_screen.dart',
-          routePath: RouteNames.jobSearch,
-          description: 'Searches and filters available and nearby jobs.',
-        ),
+        builder: (context, state) => const JobSearchScreen(),
       ),
+
+      GoRoute(
+        path: RouteNames.nearbyJobsMap,
+        name: RouteNames.nearbyJobsMapName,
+        builder: (context, state) => const NearbyJobsMapScreen(),
+      ),
+
       GoRoute(
         path: RouteNames.jobDetails,
         name: RouteNames.jobDetailsName,
         builder: (context, state) {
-          final jobId = state.pathParameters['jobId'] ?? 'unknown';
-          return _PendingFeatureScreen(
-            title: 'Job Details ($jobId)',
-            featurePath: 'lib/features/jobs/presentation/screens/job_details_screen.dart',
-            routePath: RouteNames.jobDetailsPath(jobId),
-            description:
-                'Displays full job description, requirements, and AI summary.',
-          );
+          final jobId = state.pathParameters['jobId']!;
+
+          return JobDetailsScreen(jobId: jobId);
         },
       ),
+
       GoRoute(
         path: RouteNames.applyJob,
         name: RouteNames.applyJobName,
         builder: (context, state) {
-          final jobId = state.pathParameters['jobId'] ?? 'unknown';
-          return _PendingFeatureScreen(
-            title: 'Apply for Job ($jobId)',
-            featurePath: 'lib/features/applications/presentation/screens/apply_job_screen.dart',
-            routePath: RouteNames.applyJobPath(jobId),
-            description:
-                'Attaches saved CV and collects a cover letter before submission.',
+          final jobId = state.pathParameters['jobId']!;
+
+          return Consumer(
+            builder: (context, ref, child) {
+              final jobAsync = ref.watch(jobByIdProvider(jobId));
+
+              final applicantId = ref.watch(currentUserIdProvider) ??
+                  AppConstants.defaultSampleUserId;
+
+              return jobAsync.when(
+                loading: () => const Scaffold(
+                  body: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (error, stackTrace) => Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Apply for Job'),
+                  ),
+                  body: Center(
+                    child: Text('Could not load job: $error'),
+                  ),
+                ),
+                data: (job) {
+                  if (job == null) {
+                    return const Scaffold(
+                      body: Center(
+                        child: Text('Job not found.'),
+                      ),
+                    );
+                  }
+
+                  return ApplyJobScreen(
+                    job: job,
+                    applicantId: applicantId,
+                  );
+                },
+              );
+            },
           );
         },
       ),
+
       GoRoute(
         path: RouteNames.myApplications,
         name: RouteNames.myApplicationsName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'My Applications',
-          featurePath: 'lib/features/applications/presentation/screens/my_applications_screen.dart',
-          routePath: RouteNames.myApplications,
-          description: 'Displays submitted job applications and their statuses.',
+        builder: (context, state) => Consumer(
+          builder: (context, ref, child) {
+            final applicantId = ref.watch(currentUserIdProvider) ??
+                AppConstants.defaultSampleUserId;
+
+            return MyApplicationsScreen(
+              applicantId: applicantId,
+            );
+          },
         ),
       ),
+
       GoRoute(
         path: RouteNames.savedJobs,
         name: RouteNames.savedJobsName,
         builder: (context, state) => const SavedJobsScreen(),
       ),
+
+      // --------------------------------------------------
+      // Profile (pending)
+      // --------------------------------------------------
       GoRoute(
         path: RouteNames.jobSeekerProfile,
         name: RouteNames.jobSeekerProfileName,
         builder: (context, state) => const _PendingFeatureScreen(
           title: 'Job Seeker Profile',
-          featurePath: 'lib/features/profile/presentation/screens/job_seeker_profile_screen.dart',
+          featurePath:
+              'lib/features/profile/presentation/screens/job_seeker_profile_screen.dart',
           routePath: RouteNames.jobSeekerProfile,
-          description: 'Manages personal details, skills, education, and experience.',
+          description:
+              'Manages personal details, skills, education, and experience.',
         ),
       ),
+
       GoRoute(
         path: RouteNames.myCv,
         name: RouteNames.myCvName,
         builder: (context, state) => const _PendingFeatureScreen(
           title: 'My CV',
-          featurePath: 'lib/features/profile/presentation/screens/my_cv_screen.dart',
+          featurePath:
+              'lib/features/profile/presentation/screens/my_cv_screen.dart',
           routePath: RouteNames.myCv,
           description: 'Uploads, previews, and replaces the saved CV document.',
         ),
       ),
 
-      // Employer routes
+      // --------------------------------------------------
+      // Employer (pending)
+      // --------------------------------------------------
       GoRoute(
         path: RouteNames.employerDashboard,
         name: RouteNames.employerDashboardName,
         builder: (context, state) => const _PendingFeatureScreen(
           title: 'Employer Dashboard',
-          featurePath: 'lib/features/employer/presentation/screens/employer_dashboard_screen.dart',
+          featurePath:
+              'lib/features/employer/presentation/screens/employer_dashboard_screen.dart',
           routePath: RouteNames.employerDashboard,
-          description: 'Displays recruitment statistics and employer vacancies.',
+          description:
+              'Displays recruitment statistics and employer vacancies.',
         ),
       ),
+
       GoRoute(
         path: RouteNames.postVacancy,
         name: RouteNames.postVacancyName,
         builder: (context, state) => const _PendingFeatureScreen(
           title: 'Post / Edit Vacancy',
-          featurePath: 'lib/features/employer/presentation/screens/post_vacancy_screen.dart',
+          featurePath:
+              'lib/features/employer/presentation/screens/post_vacancy_screen.dart',
           routePath: RouteNames.postVacancy,
           description: 'Creates new job vacancies or edits existing ones.',
         ),
       ),
+
       GoRoute(
         path: RouteNames.vacancyDetails,
         name: RouteNames.vacancyDetailsName,
         builder: (context, state) {
           final vacancyId = state.pathParameters['vacancyId'] ?? 'unknown';
+
           return _PendingFeatureScreen(
             title: 'Vacancy Details ($vacancyId)',
-            featurePath: 'lib/features/employer/presentation/screens/vacancy_details_screen.dart',
+            featurePath:
+                'lib/features/employer/presentation/screens/vacancy_details_screen.dart',
             routePath: RouteNames.vacancyDetailsPath(vacancyId),
             description: 'Views, edits, or deletes a published vacancy.',
           );
         },
       ),
+
       GoRoute(
         path: RouteNames.applicants,
         name: RouteNames.applicantsName,
         builder: (context, state) {
           final vacancyId = state.pathParameters['vacancyId'] ?? 'unknown';
+
           return _PendingFeatureScreen(
             title: 'Applicants ($vacancyId)',
-            featurePath: 'lib/features/employer/presentation/screens/applicants_screen.dart',
+            featurePath:
+                'lib/features/employer/presentation/screens/applicants_screen.dart',
             routePath: RouteNames.applicantsPath(vacancyId),
             description: 'Reviews applicants and updates application statuses.',
           );
         },
       ),
 
-      // Shared routes
+      // --------------------------------------------------
+      // Shared routes (submitted)
+      // --------------------------------------------------
       GoRoute(
         path: RouteNames.messages,
         name: RouteNames.messagesName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Messages',
-          featurePath: 'lib/features/messaging/presentation/screens/messages_screen.dart',
-          routePath: RouteNames.messages,
-          description: 'Real-time conversations between job seekers and employers.',
+        builder: (context, state) => Consumer(
+          builder: (context, ref, child) {
+            final userId = ref.watch(currentUserIdProvider) ??
+                AppConstants.defaultSampleUserId;
+
+            return MessagesScreen(userId: userId);
+          },
         ),
       ),
+
       GoRoute(
         path: RouteNames.notifications,
         name: RouteNames.notificationsName,
         builder: (context, state) => const NotificationsScreen(),
       ),
+
       GoRoute(
         path: RouteNames.settings,
         name: RouteNames.settingsName,
@@ -269,7 +349,9 @@ GoRouter createAppRouter({
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(title: const Text('Page Not Found')),
+      appBar: AppBar(
+        title: const Text('Page Not Found'),
+      ),
       body: EmptyStateWidget(
         icon: Icons.explore_off_outlined,
         title: 'Route Not Found',
@@ -284,8 +366,10 @@ GoRouter createAppRouter({
   );
 }
 
-/// Temporary Milestone 1 integration hub rendered at [RouteNames.home] until
-/// authentication and home screens are merged.
+// ======================================================
+// Integration Hub
+// ======================================================
+
 class _IntegrationHubScreen extends ConsumerWidget {
   const _IntegrationHubScreen();
 
@@ -301,7 +385,9 @@ class _IntegrationHubScreen extends ConsumerWidget {
         ),
         child: SafeArea(
           child: ListView(
-            padding: const EdgeInsets.all(AppConstants.pageHorizontalPadding),
+            padding: const EdgeInsets.all(
+              AppConstants.pageHorizontalPadding,
+            ),
             children: [
               Text(
                 'CORE & INTEGRATION',
@@ -319,7 +405,7 @@ class _IntegrationHubScreen extends ConsumerWidget {
               ),
               const SizedBox(height: AppConstants.sectionSpacing),
 
-              // Active Session & Theme Controls
+              // Session and theme controls
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16),
@@ -341,6 +427,7 @@ class _IntegrationHubScreen extends ConsumerWidget {
                         runSpacing: 8,
                         children: UserRole.values.map((role) {
                           final isSelected = session.role == role;
+
                           return ChoiceChip(
                             label: Text(role.name),
                             selected: isSelected,
@@ -354,7 +441,10 @@ class _IntegrationHubScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Dark Theme', style: AppTextStyles.body),
+                          const Text(
+                            'Dark Theme',
+                            style: AppTextStyles.body,
+                          ),
                           Switch(
                             value: themeMode == ThemeMode.dark,
                             onChanged: (isDark) => ref
@@ -369,6 +459,7 @@ class _IntegrationHubScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+
               const SizedBox(height: AppConstants.sectionSpacing),
 
               const Text(
@@ -376,14 +467,35 @@ class _IntegrationHubScreen extends ConsumerWidget {
                 style: AppTextStyles.sectionHeading,
               ),
               const SizedBox(height: 10),
+
               _RouteTile(
-                icon: Icons.notifications_outlined,
-                title: 'Notifications',
-                subtitle: RouteNames.notifications,
+                icon: Icons.work_outline,
+                title: 'Job Seeker Home',
+                subtitle: RouteNames.jobSeekerHome,
                 isReady: true,
-                onTap: () => context.push(RouteNames.notifications),
+                onTap: () => context.push(RouteNames.jobSeekerHome),
               ),
-              const SizedBox(height: 10),
+              _RouteTile(
+                icon: Icons.search,
+                title: 'Job Search',
+                subtitle: RouteNames.jobSearch,
+                isReady: true,
+                onTap: () => context.push(RouteNames.jobSearch),
+              ),
+              _RouteTile(
+                icon: Icons.map_outlined,
+                title: 'Nearby Jobs Map',
+                subtitle: RouteNames.nearbyJobsMap,
+                isReady: true,
+                onTap: () => context.push(RouteNames.nearbyJobsMap),
+              ),
+              _RouteTile(
+                icon: Icons.assignment_outlined,
+                title: 'My Applications',
+                subtitle: RouteNames.myApplications,
+                isReady: true,
+                onTap: () => context.push(RouteNames.myApplications),
+              ),
               _RouteTile(
                 icon: Icons.bookmark_outline,
                 title: 'Saved Jobs',
@@ -391,7 +503,20 @@ class _IntegrationHubScreen extends ConsumerWidget {
                 isReady: true,
                 onTap: () => context.push(RouteNames.savedJobs),
               ),
-              const SizedBox(height: 10),
+              _RouteTile(
+                icon: Icons.chat_bubble_outline,
+                title: 'Messages',
+                subtitle: RouteNames.messages,
+                isReady: true,
+                onTap: () => context.push(RouteNames.messages),
+              ),
+              _RouteTile(
+                icon: Icons.notifications_outlined,
+                title: 'Notifications',
+                subtitle: RouteNames.notifications,
+                isReady: true,
+                onTap: () => context.push(RouteNames.notifications),
+              ),
               _RouteTile(
                 icon: Icons.settings_outlined,
                 title: 'Settings',
@@ -399,13 +524,15 @@ class _IntegrationHubScreen extends ConsumerWidget {
                 isReady: true,
                 onTap: () => context.push(RouteNames.settings),
               ),
+
               const SizedBox(height: AppConstants.sectionSpacing),
 
               const Text(
-                'Pending Feature Routes (Stubbed)',
+                'Pending Feature Routes',
                 style: AppTextStyles.sectionHeading,
               ),
               const SizedBox(height: 10),
+
               _RouteTile(
                 icon: Icons.waving_hand_outlined,
                 title: 'Welcome',
@@ -413,7 +540,6 @@ class _IntegrationHubScreen extends ConsumerWidget {
                 isReady: false,
                 onTap: () => context.push(RouteNames.welcome),
               ),
-              const SizedBox(height: 10),
               _RouteTile(
                 icon: Icons.login_outlined,
                 title: 'Login / Registration',
@@ -421,37 +547,26 @@ class _IntegrationHubScreen extends ConsumerWidget {
                 isReady: false,
                 onTap: () => context.push(RouteNames.auth),
               ),
-              const SizedBox(height: 10),
               _RouteTile(
-                icon: Icons.work_outline,
-                title: 'Job Seeker Home',
-                subtitle: RouteNames.jobSeekerHome,
+                icon: Icons.person_outline,
+                title: 'Job Seeker Profile',
+                subtitle: RouteNames.jobSeekerProfile,
                 isReady: false,
-                onTap: () => context.push(RouteNames.jobSeekerHome),
+                onTap: () => context.push(RouteNames.jobSeekerProfile),
               ),
-              const SizedBox(height: 10),
               _RouteTile(
-                icon: Icons.search,
-                title: 'Job Search',
-                subtitle: RouteNames.jobSearch,
+                icon: Icons.description_outlined,
+                title: 'My CV',
+                subtitle: RouteNames.myCv,
                 isReady: false,
-                onTap: () => context.push(RouteNames.jobSearch),
+                onTap: () => context.push(RouteNames.myCv),
               ),
-              const SizedBox(height: 10),
               _RouteTile(
                 icon: Icons.business_center_outlined,
                 title: 'Employer Dashboard',
                 subtitle: RouteNames.employerDashboard,
                 isReady: false,
                 onTap: () => context.push(RouteNames.employerDashboard),
-              ),
-              const SizedBox(height: 10),
-              _RouteTile(
-                icon: Icons.chat_bubble_outline,
-                title: 'Messages',
-                subtitle: RouteNames.messages,
-                isReady: false,
-                onTap: () => context.push(RouteNames.messages),
               ),
             ],
           ),
@@ -460,6 +575,10 @@ class _IntegrationHubScreen extends ConsumerWidget {
     );
   }
 }
+
+// ======================================================
+// Reusable Integration Hub Tile
+// ======================================================
 
 class _RouteTile extends StatelessWidget {
   final IconData icon;
@@ -484,13 +603,22 @@ class _RouteTile extends StatelessWidget {
           icon,
           color: isReady ? AppColors.primaryBlue : AppColors.textMuted,
         ),
-        title: Text(title, style: AppTextStyles.sectionHeading),
-        subtitle: Text(subtitle, style: AppTextStyles.bodyMuted),
+        title: Text(
+          title,
+          style: AppTextStyles.sectionHeading,
+        ),
+        subtitle: Text(
+          subtitle,
+          style: AppTextStyles.bodyMuted,
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8,
+                vertical: 4,
+              ),
               decoration: BoxDecoration(
                 color: isReady
                     ? AppColors.success.withValues(alpha: 0.12)
@@ -516,7 +644,10 @@ class _RouteTile extends StatelessWidget {
   }
 }
 
-/// Placeholder displayed for routes whose feature screens are not yet merged.
+// ======================================================
+// Pending Feature Placeholder
+// ======================================================
+
 class _PendingFeatureScreen extends StatelessWidget {
   final String title;
   final String featurePath;
@@ -533,7 +664,9 @@ class _PendingFeatureScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(title)),
+      appBar: AppBar(
+        title: Text(title),
+      ),
       body: EmptyStateWidget(
         icon: Icons.construction_rounded,
         title: '$title (Pending Integration)',

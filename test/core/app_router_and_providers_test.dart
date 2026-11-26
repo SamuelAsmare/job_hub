@@ -45,13 +45,19 @@ void main() {
 
       expect(container.read(appThemeModeProvider), ThemeMode.light);
 
-      container.read(appThemeModeProvider.notifier).setThemeModeFromString('dark');
+      container
+          .read(appThemeModeProvider.notifier)
+          .setThemeModeFromString('dark');
       expect(container.read(appThemeModeProvider), ThemeMode.dark);
 
-      container.read(appThemeModeProvider.notifier).setThemeModeFromString('system');
+      container
+          .read(appThemeModeProvider.notifier)
+          .setThemeModeFromString('system');
       expect(container.read(appThemeModeProvider), ThemeMode.system);
 
-      container.read(appThemeModeProvider.notifier).setThemeMode(ThemeMode.light);
+      container
+          .read(appThemeModeProvider.notifier)
+          .setThemeMode(ThemeMode.light);
       expect(container.read(appThemeModeProvider), ThemeMode.light);
     });
   });
@@ -88,7 +94,8 @@ void main() {
       expect(find.text('Welcome (Pending Integration)'), findsOneWidget);
     });
 
-    testWidgets('redirects jobSeeker away from employer routes', (tester) async {
+    testWidgets('redirects jobSeeker away from employer routes',
+        (tester) async {
       final router = createAppRouter(
         readSession: () => const AppSessionState.sampleJobSeeker(),
         initialLocation: RouteNames.employerDashboard,
@@ -101,7 +108,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Job Seeker Home (Pending Integration)'), findsOneWidget);
+      expect(find.text('Find your next opportunity'), findsOneWidget);
     });
 
     testWidgets('redirects employer away from job-seeker-only routes', (
