@@ -1,0 +1,61 @@
+/// Centralized route paths, route names, and path builders for JobHub.
+///
+/// Teammates should use these constants with `context.go(...)`,
+/// `context.push(...)`, or `context.goNamed(...)` instead of hardcoding paths.
+class RouteNames {
+  RouteNames._();
+
+  // Root / Milestone 1 Integration Hub
+  static const String home = '/';
+  static const String homeName = 'home';
+
+  // Authentication
+  static const String welcome = '/welcome';
+  static const String welcomeName = 'welcome';
+  static const String auth = '/auth';
+  static const String authName = 'auth';
+
+  // Job Seeker
+  static const String jobSeekerHome = '/seeker';
+  static const String jobSeekerHomeName = 'job-seeker-home';
+  static const String jobSearch = '/jobs/search';
+  static const String jobSearchName = 'job-search';
+  static const String jobDetails = '/jobs/:jobId';
+  static const String jobDetailsName = 'job-details';
+  static const String applyJob = '/jobs/:jobId/apply';
+  static const String applyJobName = 'apply-job';
+  static const String myApplications = '/applications';
+  static const String myApplicationsName = 'my-applications';
+  static const String savedJobs = '/saved-jobs';
+  static const String savedJobsName = 'saved-jobs';
+  static const String jobSeekerProfile = '/profile';
+  static const String jobSeekerProfileName = 'job-seeker-profile';
+  static const String myCv = '/profile/cv';
+  static const String myCvName = 'my-cv';
+
+  // Employer / Recruiter
+  static const String employerDashboard = '/employer';
+  static const String employerDashboardName = 'employer-dashboard';
+  static const String postVacancy = '/employer/post-vacancy';
+  static const String postVacancyName = 'post-vacancy';
+  static const String vacancyDetails = '/employer/vacancies/:vacancyId';
+  static const String vacancyDetailsName = 'vacancy-details';
+  static const String applicants = '/employer/vacancies/:vacancyId/applicants';
+  static const String applicantsName = 'applicants';
+
+  // Shared across authenticated roles
+  static const String messages = '/messages';
+  static const String messagesName = 'messages';
+  static const String notifications = '/notifications';
+  static const String notificationsName = 'notifications';
+  static const String settings = '/settings';
+  static const String settingsName = 'settings';
+
+  // Typed path builders for parameterized routes
+  static String jobDetailsPath(String jobId) => '/jobs/$jobId';
+  static String applyJobPath(String jobId) => '/jobs/$jobId/apply';
+  static String vacancyDetailsPath(String vacancyId) =>
+      '/employer/vacancies/$vacancyId';
+  static String applicantsPath(String vacancyId) =>
+      '/employer/vacancies/$vacancyId/applicants';
+}
