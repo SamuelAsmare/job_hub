@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/providers/app_providers.dart' as core_providers;
+import '../../../../core/router/route_names.dart';
+import '../../../saved_jobs/domain/models/saved_job.dart';
+import '../../../saved_jobs/presentation/providers/saved_job_provider.dart';
 import '../providers/job_provider.dart';
 
 class JobDetailsScreen extends ConsumerWidget {
@@ -14,10 +20,68 @@ class JobDetailsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final jobAsync = ref.watch(jobByIdProvider(jobId));
+    final savedJobsAsync = ref.watch(savedJobsProvider);
+    final isSaved = savedJobsAsync.maybeWhen(
+      data: (items) => items.any((item) => item.jobId == jobId),
+      orElse: () => false,
+    );
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Job Details'),
+        actions: [
+          IconButton(
+            tooltip: isSaved ? 'Remove from saved' : 'Save job',
+            icon: Icon(
+              isSaved ? Icons.bookmark : Icons.bookmark_border,
+            ),
+            onPressed: () async {
+              final notifier = ref.read(savedJobsProvider.notifier);
+              if (isSaved) {
+                await notifier.removeSavedJob(jobId);
+              } else {
+                final userId = ref.read(core_providers.currentUserIdProvider) ??
+                    AppConstants.defaultSampleUserId;
+                await notifier.saveJob(
+                  SavedJob(
+                    id: 'saved_${DateTime.now().millisecondsSinceEpoch}',
+                    userId: userId,
+                    jobId: jobId,
+                    savedAt: DateTime.now(),
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+      bottomNavigationBar: jobAsync.maybeWhen(
+        data: (job) => job == null
+            ? null
+            : SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  child: Row(
+                    children: [
+                      OutlinedButton.icon(
+                        onPressed: () => context.push(RouteNames.messages),
+                        icon: const Icon(Icons.chat_bubble_outline),
+                        label: const Text('Message'),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: () =>
+                              context.push(RouteNames.applyJobPath(job.id)),
+                          icon: const Icon(Icons.send_outlined),
+                          label: const Text('Apply Now'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+        orElse: () => null,
       ),
       body: jobAsync.when(
         loading: () => const Center(

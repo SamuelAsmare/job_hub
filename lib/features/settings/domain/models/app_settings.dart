@@ -9,7 +9,6 @@ abstract class AppSettings with _$AppSettings {
     @Default(true) bool notificationsEnabled,
     @Default(true) bool emailNotificationsEnabled,
     @Default(true) bool pushNotificationsEnabled,
-    @Default('en') String language,
     @Default('light') String themeMode,
   }) = _AppSettings;
 }

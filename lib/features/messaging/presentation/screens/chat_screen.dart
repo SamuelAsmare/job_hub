@@ -6,6 +6,44 @@ import '../../domain/models/message.dart';
 import '../providers/message_provider.dart';
 import '../../data/datasources/message_socket_service.dart';
 
+/// Router-compatible entry point: looks up the conversation by [conversationId]
+/// and delegates to [ChatScreen] once loaded.
+class ChatLoadingScreen extends ConsumerWidget {
+  const ChatLoadingScreen({
+    required this.conversationId,
+    required this.currentUserId,
+    super.key,
+  });
+
+  final String conversationId;
+  final String currentUserId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final conversationsAsync = ref.watch(conversationsProvider(currentUserId));
+
+    return conversationsAsync.when(
+      loading: () => const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      ),
+      error: (e, _) => Scaffold(
+        appBar: AppBar(title: const Text('Chat')),
+        body: Center(child: Text('Could not load conversation: $e')),
+      ),
+      data: (conversations) {
+        final conversation = conversations.firstWhere(
+          (c) => c.id == conversationId,
+          orElse: () => conversations.first,
+        );
+        return ChatScreen(
+          conversation: conversation,
+          currentUserId: currentUserId,
+        );
+      },
+    );
+  }
+}
+
 class ChatScreen extends ConsumerStatefulWidget {
   const ChatScreen({
     required this.conversation,

@@ -19,7 +19,6 @@ mixin _$AppSettings {
   bool get notificationsEnabled;
   bool get emailNotificationsEnabled;
   bool get pushNotificationsEnabled;
-  String get language;
   String get themeMode;
 
   /// Create a copy of AppSettings
@@ -48,8 +47,6 @@ mixin _$AppSettings {
                     _this.pushNotificationsEnabled) ||
                 other.pushNotificationsEnabled ==
                     _this.pushNotificationsEnabled) &&
-            (identical(other.language, _this.language) ||
-                other.language == _this.language) &&
             (identical(other.themeMode, _this.themeMode) ||
                 other.themeMode == _this.themeMode));
   }
@@ -63,14 +60,13 @@ mixin _$AppSettings {
         _this.notificationsEnabled,
         _this.emailNotificationsEnabled,
         _this.pushNotificationsEnabled,
-        _this.language,
         _this.themeMode);
   }
 
   @override
   String toString() {
     final _this = this as AppSettings;
-    return 'AppSettings(userId: ${_this.userId}, notificationsEnabled: ${_this.notificationsEnabled}, emailNotificationsEnabled: ${_this.emailNotificationsEnabled}, pushNotificationsEnabled: ${_this.pushNotificationsEnabled}, language: ${_this.language}, themeMode: ${_this.themeMode})';
+    return 'AppSettings(userId: ${_this.userId}, notificationsEnabled: ${_this.notificationsEnabled}, emailNotificationsEnabled: ${_this.emailNotificationsEnabled}, pushNotificationsEnabled: ${_this.pushNotificationsEnabled}, themeMode: ${_this.themeMode})';
   }
 }
 
@@ -85,7 +81,6 @@ abstract mixin class $AppSettingsCopyWith<$Res> {
       bool notificationsEnabled,
       bool emailNotificationsEnabled,
       bool pushNotificationsEnabled,
-      String language,
       String themeMode});
 }
 
@@ -105,7 +100,6 @@ class _$AppSettingsCopyWithImpl<$Res> implements $AppSettingsCopyWith<$Res> {
     Object? notificationsEnabled = null,
     Object? emailNotificationsEnabled = null,
     Object? pushNotificationsEnabled = null,
-    Object? language = null,
     Object? themeMode = null,
   }) {
     return _then(AppSettings(
@@ -125,10 +119,6 @@ class _$AppSettingsCopyWithImpl<$Res> implements $AppSettingsCopyWith<$Res> {
           ? _self.pushNotificationsEnabled
           : pushNotificationsEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
-      language: null == language
-          ? _self.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String,
       themeMode: null == themeMode
           ? _self.themeMode
           : themeMode // ignore: cast_nullable_to_non_nullable
@@ -235,7 +225,6 @@ extension AppSettingsPatterns on AppSettings {
             bool notificationsEnabled,
             bool emailNotificationsEnabled,
             bool pushNotificationsEnabled,
-            String language,
             String themeMode)?
         $default, {
     required TResult orElse(),
@@ -248,7 +237,6 @@ extension AppSettingsPatterns on AppSettings {
             _that.notificationsEnabled,
             _that.emailNotificationsEnabled,
             _that.pushNotificationsEnabled,
-            _that.language,
             _that.themeMode);
       case _:
         return orElse();
@@ -275,7 +263,6 @@ extension AppSettingsPatterns on AppSettings {
             bool notificationsEnabled,
             bool emailNotificationsEnabled,
             bool pushNotificationsEnabled,
-            String language,
             String themeMode)
         $default,
   ) {
@@ -287,7 +274,6 @@ extension AppSettingsPatterns on AppSettings {
             _that.notificationsEnabled,
             _that.emailNotificationsEnabled,
             _that.pushNotificationsEnabled,
-            _that.language,
             _that.themeMode);
       case _:
         throw StateError('Unexpected subclass');
@@ -313,7 +299,6 @@ extension AppSettingsPatterns on AppSettings {
             bool notificationsEnabled,
             bool emailNotificationsEnabled,
             bool pushNotificationsEnabled,
-            String language,
             String themeMode)?
         $default,
   ) {
@@ -325,7 +310,6 @@ extension AppSettingsPatterns on AppSettings {
             _that.notificationsEnabled,
             _that.emailNotificationsEnabled,
             _that.pushNotificationsEnabled,
-            _that.language,
             _that.themeMode);
       case _:
         return null;
@@ -341,7 +325,6 @@ class _AppSettings implements AppSettings {
       this.notificationsEnabled = true,
       this.emailNotificationsEnabled = true,
       this.pushNotificationsEnabled = true,
-      this.language = 'en',
       this.themeMode = 'light'});
 
   @override
@@ -355,9 +338,6 @@ class _AppSettings implements AppSettings {
   @override
   @JsonKey()
   final bool pushNotificationsEnabled;
-  @override
-  @JsonKey()
-  final String language;
   @override
   @JsonKey()
   final String themeMode;
@@ -384,27 +364,19 @@ class _AppSettings implements AppSettings {
             (identical(
                     other.pushNotificationsEnabled, pushNotificationsEnabled) ||
                 other.pushNotificationsEnabled == pushNotificationsEnabled) &&
-            (identical(other.language, language) ||
-                other.language == language) &&
             (identical(other.themeMode, themeMode) ||
                 other.themeMode == themeMode));
   }
 
   @override
   int get hashCode {
-    return Object.hash(
-        runtimeType,
-        userId,
-        notificationsEnabled,
-        emailNotificationsEnabled,
-        pushNotificationsEnabled,
-        language,
-        themeMode);
+    return Object.hash(runtimeType, userId, notificationsEnabled,
+        emailNotificationsEnabled, pushNotificationsEnabled, themeMode);
   }
 
   @override
   String toString() {
-    return 'AppSettings(userId: $userId, notificationsEnabled: $notificationsEnabled, emailNotificationsEnabled: $emailNotificationsEnabled, pushNotificationsEnabled: $pushNotificationsEnabled, language: $language, themeMode: $themeMode)';
+    return 'AppSettings(userId: $userId, notificationsEnabled: $notificationsEnabled, emailNotificationsEnabled: $emailNotificationsEnabled, pushNotificationsEnabled: $pushNotificationsEnabled, themeMode: $themeMode)';
   }
 }
 
@@ -421,7 +393,6 @@ abstract mixin class _$AppSettingsCopyWith<$Res>
       bool notificationsEnabled,
       bool emailNotificationsEnabled,
       bool pushNotificationsEnabled,
-      String language,
       String themeMode});
 }
 
@@ -441,7 +412,6 @@ class __$AppSettingsCopyWithImpl<$Res> implements _$AppSettingsCopyWith<$Res> {
     Object? notificationsEnabled = null,
     Object? emailNotificationsEnabled = null,
     Object? pushNotificationsEnabled = null,
-    Object? language = null,
     Object? themeMode = null,
   }) {
     return _then(_AppSettings(
@@ -461,10 +431,6 @@ class __$AppSettingsCopyWithImpl<$Res> implements _$AppSettingsCopyWith<$Res> {
           ? _self.pushNotificationsEnabled
           : pushNotificationsEnabled // ignore: cast_nullable_to_non_nullable
               as bool,
-      language: null == language
-          ? _self.language
-          : language // ignore: cast_nullable_to_non_nullable
-              as String,
       themeMode: null == themeMode
           ? _self.themeMode
           : themeMode // ignore: cast_nullable_to_non_nullable

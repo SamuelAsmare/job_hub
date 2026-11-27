@@ -152,7 +152,7 @@ class _NearbyJobsMapScreenState extends ConsumerState<NearbyJobsMapScreen> {
               ),
           ],
         ),
-        RichAttributionWidget(
+        const RichAttributionWidget(
           attributions: [
             TextSourceAttribution(
               'OpenStreetMap contributors',

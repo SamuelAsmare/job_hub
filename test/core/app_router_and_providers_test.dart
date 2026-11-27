@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:job_hub/core/constants/app_constants.dart';
 import 'package:job_hub/core/providers/app_providers.dart';
 import 'package:job_hub/core/router/app_router.dart';
 import 'package:job_hub/core/router/route_names.dart';
@@ -14,13 +13,10 @@ void main() {
 
       expect(
         container.read(appSessionProvider),
-        const AppSessionState.sampleJobSeeker(),
+        const AppSessionState(),
       );
-      expect(
-        container.read(currentUserIdProvider),
-        AppConstants.defaultSampleUserId,
-      );
-      expect(container.read(currentUserRoleProvider), UserRole.jobSeeker);
+      expect(container.read(currentUserIdProvider), isNull);
+      expect(container.read(currentUserRoleProvider), UserRole.guest);
 
       container.read(appSessionProvider.notifier).switchRole(UserRole.employer);
       expect(container.read(currentUserRoleProvider), UserRole.employer);

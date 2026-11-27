@@ -31,7 +31,6 @@ void main() {
             notificationsEnabled: true,
             emailNotificationsEnabled: true,
             pushNotificationsEnabled: true,
-            language: 'en',
             themeMode: 'light',
           ),
         },
@@ -46,7 +45,6 @@ void main() {
       expect(find.text('Enable Notifications'), findsOneWidget);
       expect(find.text('Email Notifications'), findsOneWidget);
       expect(find.text('Push Notifications'), findsOneWidget);
-      expect(find.text('Language'), findsOneWidget);
       expect(find.text('Theme Mode'), findsOneWidget);
       
       // Scroll to account section
@@ -67,7 +65,6 @@ void main() {
             notificationsEnabled: true,
             emailNotificationsEnabled: true,
             pushNotificationsEnabled: true,
-            language: 'en',
             themeMode: 'light',
           ),
         },

@@ -1,42 +1,18 @@
-class EmployerProfile {
-  const EmployerProfile({
-    required this.employerId,
-    required this.companyName,
-    required this.industry,
-    required this.description,
-    this.location,
-    this.website,
-    this.phone,
-    this.logoUrl,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final String employerId;
-  final String companyName;
-  final String industry;
-  final String description;
-  final String? location;
-  final String? website;
-  final String? phone;
-  final String? logoUrl;
+part 'employer_profile.freezed.dart';
 
-  EmployerProfile copyWith({
-    String? companyName,
-    String? industry,
-    String? description,
+/// Immutable employer company profile model.
+@freezed
+abstract class EmployerProfile with _$EmployerProfile {
+  const factory EmployerProfile({
+    required String employerId,
+    required String companyName,
+    required String industry,
+    required String description,
     String? location,
     String? website,
     String? phone,
     String? logoUrl,
-  }) {
-    return EmployerProfile(
-      employerId: employerId,
-      companyName: companyName ?? this.companyName,
-      industry: industry ?? this.industry,
-      description: description ?? this.description,
-      location: location ?? this.location,
-      website: website ?? this.website,
-      phone: phone ?? this.phone,
-      logoUrl: logoUrl ?? this.logoUrl,
-    );
-  }
+  }) = _EmployerProfile;
 }

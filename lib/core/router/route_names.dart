@@ -58,6 +58,9 @@ class RouteNames {
   static const String messages = '/messages';
   static const String messagesName = 'messages';
 
+  static const String chat = '/messages/:conversationId';
+  static const String chatName = 'chat';
+
   static const String notifications = '/notifications';
   static const String notificationsName = 'notifications';
 
@@ -68,6 +71,8 @@ class RouteNames {
   static String jobDetailsPath(String jobId) => '/jobs/$jobId';
 
   static String applyJobPath(String jobId) => '/jobs/$jobId/apply';
+
+  static String chatPath(String conversationId) => '/messages/$conversationId';
 
   static String vacancyDetailsPath(String vacancyId) =>
       '/employer/vacancies/$vacancyId';

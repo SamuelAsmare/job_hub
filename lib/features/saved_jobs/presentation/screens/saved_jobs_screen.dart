@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../../../core/router/route_names.dart';
 import '../providers/saved_job_provider.dart';
 import '../widgets/saved_job_card.dart';
 
@@ -122,7 +124,14 @@ class SavedJobsScreen extends ConsumerWidget {
             children: [
               InkWell(
                 borderRadius: BorderRadius.circular(12),
-                onTap: () => Navigator.of(context).maybePop(),
+                onTap: () {
+                  final router = GoRouter.maybeOf(context);
+                  if (router != null) {
+                    if (router.canPop()) router.pop();
+                  } else {
+                    Navigator.of(context).maybePop();
+                  }
+                },
                 child: Container(
                   width: 40,
                   height: 40,
@@ -227,7 +236,14 @@ class SavedJobsScreen extends ConsumerWidget {
             SizedBox(
               height: 46,
               child: ElevatedButton.icon(
-                onPressed: () => Navigator.of(context).maybePop(),
+                onPressed: () {
+                  final router = GoRouter.maybeOf(context);
+                  if (router != null) {
+                    router.push(RouteNames.jobSearch);
+                  } else {
+                    Navigator.of(context).maybePop();
+                  }
+                },
                 icon: const Icon(Icons.search_rounded, size: 18),
                 label: const Text(
                   'Explore Jobs',

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/route_names.dart';
 import '../../domain/models/conversation.dart';
 import '../providers/message_provider.dart';
-import 'chat_screen.dart';
 
 class MessagesScreen extends ConsumerWidget {
   const MessagesScreen({
@@ -64,14 +65,7 @@ class MessagesScreen extends ConsumerWidget {
                   conversation: conversations[index],
                   currentUserId: userId,
                   onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => ChatScreen(
-                          conversation: conversations[index],
-                          currentUserId: userId,
-                        ),
-                      ),
-                    );
+                    context.push(RouteNames.chatPath(conversations[index].id));
                   },
                 );
               },

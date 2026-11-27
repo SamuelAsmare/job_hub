@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../domain/models/app_settings.dart';
 import '../providers/settings_provider.dart';
 
@@ -14,21 +15,48 @@ class SettingsScreen extends ConsumerWidget {
   static const Color mutedText = Color(0xFF7485A3);
   static const Color inputBorder = Color(0xFFD6E2F5);
 
+  static const Color _darkSurface = Color(0xFF0F172A);
+  static const Color _darkCard = Color(0xFF1E293B);
+  static const Color _darkBorder = Color(0xFF334155);
+  static const Color _darkTextPrimary = Color(0xFFF8FAFC);
+  static const Color _darkTextSecondary = Color(0xFF94A3B8);
+
+  bool _isDark(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark;
+
+  Color _titleColor(BuildContext context) =>
+      _isDark(context) ? _darkTextPrimary : primaryNavy;
+
+  Color _subtitleColor(BuildContext context) =>
+      _isDark(context) ? _darkTextSecondary : secondaryText;
+
+  Color _cardColor(BuildContext context) =>
+      _isDark(context) ? _darkCard : Colors.white;
+
+  Color _borderColor(BuildContext context) =>
+      _isDark(context) ? _darkBorder : inputBorder;
+
+  Color _iconBoxColor(BuildContext context) =>
+      _isDark(context) ? _darkSurface : paleBlueBackground;
+
+  Color _accentColor(BuildContext context) =>
+      _isDark(context) ? accentCyan : primaryBlue;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(settingsProvider);
+    final isDark = _isDark(context);
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              paleBlueBackground,
-              Colors.white,
-            ],
-            stops: [0.0, 0.35],
+            colors: isDark
+                ? [_darkCard, _darkSurface]
+                : [paleBlueBackground, Colors.white],
+            stops: const [0.0, 0.35],
           ),
         ),
         child: SafeArea(
@@ -55,21 +83,21 @@ class SettingsScreen extends ConsumerWidget {
                             color: Colors.redAccent,
                           ),
                           const SizedBox(height: 12),
-                          const Text(
+                          Text(
                             'Failed to load settings',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: primaryNavy,
+                              color: _titleColor(context),
                             ),
                           ),
                           const SizedBox(height: 8),
                           Text(
                             error.toString(),
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
-                              color: secondaryText,
+                              color: _subtitleColor(context),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -88,7 +116,8 @@ class SettingsScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  data: (settings) => _buildSettingsContent(context, ref, settings),
+                  data: (settings) =>
+                      _buildSettingsContent(context, ref, settings),
                 ),
               ),
             ],
@@ -105,7 +134,7 @@ class SettingsScreen extends ConsumerWidget {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: _cardColor(context),
               borderRadius: BorderRadius.circular(12),
               boxShadow: [
                 BoxShadow(
@@ -116,20 +145,23 @@ class SettingsScreen extends ConsumerWidget {
               ],
             ),
             child: IconButton(
-              icon: const Icon(
+              icon: Icon(
                 Icons.arrow_back_ios_new_rounded,
                 size: 18,
-                color: primaryNavy,
+                color: _titleColor(context),
               ),
               onPressed: () {
-                if (Navigator.of(context).canPop()) {
+                final router = GoRouter.maybeOf(context);
+                if (router != null) {
+                  if (router.canPop()) router.pop();
+                } else if (Navigator.of(context).canPop()) {
                   Navigator.of(context).pop();
                 }
               },
             ),
           ),
           const SizedBox(width: 16),
-          const Column(
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
@@ -138,16 +170,16 @@ class SettingsScreen extends ConsumerWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.2,
-                  color: primaryBlue,
+                  color: _accentColor(context),
                 ),
               ),
-              SizedBox(height: 2),
+              const SizedBox(height: 2),
               Text(
                 'Settings',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: primaryNavy,
+                  color: _titleColor(context),
                 ),
               ),
             ],
@@ -163,15 +195,18 @@ class SettingsScreen extends ConsumerWidget {
     AppSettings settings,
   ) {
     final notifier = ref.read(settingsProvider.notifier);
+    final dividerColor = _borderColor(context);
 
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       children: [
-        _buildSectionHeader('NOTIFICATIONS'),
+        _buildSectionHeader(context, 'NOTIFICATIONS'),
         const SizedBox(height: 8),
         _buildCard(
+          context,
           children: [
             _buildSwitchTile(
+              context,
               title: 'Enable Notifications',
               subtitle: 'Receive updates and alerts',
               value: settings.notificationsEnabled,
@@ -179,16 +214,18 @@ class SettingsScreen extends ConsumerWidget {
               icon: Icons.notifications_active_outlined,
             ),
             if (settings.notificationsEnabled) ...[
-              const Divider(height: 1, color: inputBorder),
+              Divider(height: 1, color: dividerColor),
               _buildSwitchTile(
+                context,
                 title: 'Email Notifications',
                 subtitle: 'Get job updates via email',
                 value: settings.emailNotificationsEnabled,
                 onChanged: (val) => notifier.toggleEmailNotifications(val),
                 icon: Icons.mail_outline_rounded,
               ),
-              const Divider(height: 1, color: inputBorder),
+              Divider(height: 1, color: dividerColor),
               _buildSwitchTile(
+                context,
                 title: 'Push Notifications',
                 subtitle: 'Real-time alerts on your device',
                 value: settings.pushNotificationsEnabled,
@@ -199,28 +236,13 @@ class SettingsScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 24),
-        _buildSectionHeader('PREFERENCES'),
+        _buildSectionHeader(context, 'PREFERENCES'),
         const SizedBox(height: 8),
         _buildCard(
+          context,
           children: [
             _buildDropdownTile(
-              title: 'Language',
-              subtitle: 'Select application language',
-              value: settings.language,
-              icon: Icons.language_rounded,
-              items: const [
-                DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'am', child: Text('Amharic (አማርኛ)')),
-                DropdownMenuItem(value: 'om', child: Text('Afaan Oromoo')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  notifier.updateLanguage(val);
-                }
-              },
-            ),
-            const Divider(height: 1, color: inputBorder),
-            _buildDropdownTile(
+              context,
               title: 'Theme Mode',
               subtitle: 'Choose display theme',
               value: settings.themeMode,
@@ -239,37 +261,39 @@ class SettingsScreen extends ConsumerWidget {
           ],
         ),
         const SizedBox(height: 24),
-        _buildSectionHeader('ACCOUNT'),
+        _buildSectionHeader(context, 'ACCOUNT'),
         const SizedBox(height: 8),
         _buildCard(
+          context,
           children: [
             ListTile(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               leading: Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: paleBlueBackground,
+                  color: _iconBoxColor(context),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.person_outline_rounded,
-                  color: primaryNavy,
+                  color: _titleColor(context),
                   size: 20,
                 ),
               ),
-              title: const Text(
+              title: Text(
                 'User Account',
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
-                  color: primaryNavy,
+                  color: _titleColor(context),
                 ),
               ),
               subtitle: Text(
                 settings.userId,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 12,
-                  color: secondaryText,
+                  color: _subtitleColor(context),
                 ),
               ),
             ),
@@ -280,30 +304,30 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(BuildContext context, String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.1,
-          color: primaryBlue,
+          color: _accentColor(context),
         ),
       ),
     );
   }
 
-  Widget _buildCard({required List<Widget> children}) {
+  Widget _buildCard(BuildContext context, {required List<Widget> children}) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _cardColor(context),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: inputBorder, width: 1),
+        border: Border.all(color: _borderColor(context), width: 1),
         boxShadow: [
           BoxShadow(
-            color: primaryNavy.withValues(alpha: 0.04),
+            color: primaryNavy.withValues(alpha: _isDark(context) ? 0.2 : 0.04),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -320,7 +344,8 @@ class SettingsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSwitchTile({
+  Widget _buildSwitchTile(
+    BuildContext context, {
     required String title,
     required String subtitle,
     required bool value,
@@ -333,39 +358,40 @@ class SettingsScreen extends ConsumerWidget {
       activeThumbColor: primaryBlue,
       activeTrackColor: primaryBlue.withValues(alpha: 0.3),
       inactiveThumbColor: Colors.white,
-      inactiveTrackColor: inputBorder,
+      inactiveTrackColor: _borderColor(context),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       secondary: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: paleBlueBackground,
+          color: _iconBoxColor(context),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           icon,
-          color: primaryNavy,
+          color: _titleColor(context),
           size: 20,
         ),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: primaryNavy,
+          color: _titleColor(context),
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
-          color: secondaryText,
+          color: _subtitleColor(context),
         ),
       ),
     );
   }
 
-  Widget _buildDropdownTile<T>({
+  Widget _buildDropdownTile<T>(
+    BuildContext context, {
     required String title,
     required String subtitle,
     required T value,
@@ -378,43 +404,44 @@ class SettingsScreen extends ConsumerWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: paleBlueBackground,
+          color: _iconBoxColor(context),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(
           icon,
-          color: primaryNavy,
+          color: _titleColor(context),
           size: 20,
         ),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: primaryNavy,
+          color: _titleColor(context),
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 12,
-          color: secondaryText,
+          color: _subtitleColor(context),
         ),
       ),
       trailing: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           value: value,
+          dropdownColor: _cardColor(context),
           items: items,
           onChanged: onChanged,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w600,
-            color: primaryNavy,
+            color: _titleColor(context),
           ),
-          icon: const Icon(
+          icon: Icon(
             Icons.keyboard_arrow_down_rounded,
-            color: primaryBlue,
+            color: _accentColor(context),
           ),
           borderRadius: BorderRadius.circular(12),
         ),

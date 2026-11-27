@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart' as io;
 
 enum SocketConnectionState {
   connecting,
@@ -10,7 +10,7 @@ enum SocketConnectionState {
 }
 
 class MessageSocketService {
-  IO.Socket? _socket;
+  io.Socket? _socket;
 
   SocketConnectionState _connectionState = SocketConnectionState.disconnected;
 
@@ -42,9 +42,9 @@ class MessageSocketService {
       if (token != null && token.isNotEmpty) 'token': token,
     };
 
-    _socket = IO.io(
+    _socket = io.io(
       serverUrl,
-      IO.OptionBuilder()
+      io.OptionBuilder()
           .setTransports(['websocket'])
           .disableAutoConnect()
           .setAuth(auth)

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/route_names.dart';
 import '../providers/job_provider.dart';
 import '../widgets/job_card.dart';
 
@@ -15,27 +16,27 @@ class JobSearchScreen extends ConsumerStatefulWidget {
 class _JobSearchScreenState extends ConsumerState<JobSearchScreen> {
   final TextEditingController _searchController = TextEditingController();
 
-  String _query = '';
-
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
   }
 
-  void _search(String value) {
-    setState(() {
-      _query = value.trim();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    final jobsAsync = ref.watch(jobSearchProvider(_query));
+    final query = ref.watch(jobSearchQueryProvider);
+    final jobsAsync = ref.watch(jobSearchProvider(query));
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Jobs'),
+        actions: [
+          IconButton(
+            onPressed: () => context.push(RouteNames.nearbyJobsMap),
+            icon: const Icon(Icons.map_outlined),
+            tooltip: 'Nearby jobs map',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -43,15 +44,16 @@ class _JobSearchScreenState extends ConsumerState<JobSearchScreen> {
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
-              onChanged: _search,
+              onChanged: (value) =>
+                  ref.read(jobSearchQueryProvider.notifier).setQuery(value),
               decoration: InputDecoration(
                 hintText: 'Search title, company, or location',
                 prefixIcon: const Icon(Icons.search),
-                suffixIcon: _query.isNotEmpty
+                suffixIcon: query.isNotEmpty
                     ? IconButton(
                         onPressed: () {
                           _searchController.clear();
-                          _search('');
+                          ref.read(jobSearchQueryProvider.notifier).clear();
                         },
                         icon: const Icon(Icons.clear),
                         tooltip: 'Clear search',

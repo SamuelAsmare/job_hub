@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/providers/app_providers.dart';
 import '../../data/repositories/settings_repository_impl.dart';
 import '../../data/sample_data/sample_settings.dart';
 import '../../domain/models/app_settings.dart';
@@ -48,16 +49,12 @@ class SettingsNotifier extends AsyncNotifier<AppSettings> {
     await updateSettings(current.copyWith(pushNotificationsEnabled: enabled));
   }
 
-  Future<void> updateLanguage(String language) async {
-    final current = state.value;
-    if (current == null) return;
-    await updateSettings(current.copyWith(language: language));
-  }
-
   Future<void> updateThemeMode(String themeMode) async {
     final current = state.value;
     if (current == null) return;
     await updateSettings(current.copyWith(themeMode: themeMode));
+    // Propagate to the global theme provider so MaterialApp reflects the change
+    ref.read(appThemeModeProvider.notifier).setThemeModeFromString(themeMode);
   }
 }
 

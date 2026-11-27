@@ -9,6 +9,8 @@
 .flutter-plugins
 .flutter-plugins-dependencies
 build/
+coverage/
+*.log
 
 # IDE files
 .idea/

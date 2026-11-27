@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/providers/app_providers.dart';
+import '../../../../core/router/route_names.dart';
 import '../providers/job_provider.dart';
 import '../widgets/job_card.dart';
 
@@ -17,12 +19,24 @@ class JobSeekerHomeScreen extends ConsumerWidget {
         title: const Text('JobHub'),
         actions: [
           IconButton(
-            onPressed: () => context.push('/jobs/search'),
+            onPressed: () => context.push(RouteNames.nearbyJobsMap),
+            icon: const Icon(Icons.map_outlined),
+            tooltip: 'Nearby jobs map',
+          ),
+          IconButton(
+            onPressed: () => context.push(RouteNames.jobSearch),
             icon: const Icon(Icons.search),
             tooltip: 'Search jobs',
           ),
+          IconButton(
+            onPressed: () => context.push(RouteNames.jobSeekerProfile),
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Profile',
+          ),
         ],
       ),
+      drawer: const _JobSeekerDrawer(),
+      bottomNavigationBar: _JobSeekerBottomNav(),
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(jobsProvider.future),
         child: ListView(
@@ -109,6 +123,123 @@ class JobSeekerHomeScreen extends ConsumerWidget {
             const SizedBox(height: 24),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// Persistent bottom navigation for the job-seeker flow.
+class _JobSeekerBottomNav extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return NavigationBar(
+      selectedIndex: 0,
+      onDestinationSelected: (index) {
+        switch (index) {
+          case 0:
+            context.go(RouteNames.jobSeekerHome);
+          case 1:
+            context.push(RouteNames.savedJobs);
+          case 2:
+            context.push(RouteNames.myApplications);
+          case 3:
+            context.push(RouteNames.messages);
+          case 4:
+            context.push(RouteNames.notifications);
+        }
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.bookmark_outline),
+          selectedIcon: Icon(Icons.bookmark),
+          label: 'Saved',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.assignment_outlined),
+          selectedIcon: Icon(Icons.assignment),
+          label: 'Applications',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.chat_bubble_outline),
+          selectedIcon: Icon(Icons.chat_bubble),
+          label: 'Messages',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.notifications_outlined),
+          selectedIcon: Icon(Icons.notifications),
+          label: 'Alerts',
+        ),
+      ],
+    );
+  }
+}
+
+/// Navigation drawer providing access to profile, CV, map, settings, and sign out.
+class _JobSeekerDrawer extends ConsumerWidget {
+  const _JobSeekerDrawer();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: [
+          DrawerHeader(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+            ),
+            child: const Text(
+              'JobHub',
+              style: TextStyle(color: Colors.white, fontSize: 22),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.person_outline),
+            title: const Text('Profile'),
+            onTap: () {
+              Navigator.of(context).pop();
+              context.push(RouteNames.jobSeekerProfile);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.description_outlined),
+            title: const Text('My CV'),
+            onTap: () {
+              Navigator.of(context).pop();
+              context.push(RouteNames.myCv);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.map_outlined),
+            title: const Text('Nearby Jobs Map'),
+            onTap: () {
+              Navigator.of(context).pop();
+              context.push(RouteNames.nearbyJobsMap);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.settings_outlined),
+            title: const Text('Settings'),
+            onTap: () {
+              Navigator.of(context).pop();
+              context.push(RouteNames.settings);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Sign Out'),
+            onTap: () {
+              Navigator.of(context).pop();
+              ref.read(appSessionProvider.notifier).signOut();
+            },
+          ),
+        ],
       ),
     );
   }

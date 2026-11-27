@@ -213,7 +213,7 @@ class _PostVacancyScreenState extends ConsumerState<PostVacancyScreen> {
               },
             ),
             const SizedBox(height: 16),
-            _field(_salaryController, 'Salary (optional)', required: false),
+            _field(_salaryController, 'Salary in ETB (optional, e.g. 30,000 Birr)', required: false),
             _field(
               _descriptionController,
               'Job Description',
