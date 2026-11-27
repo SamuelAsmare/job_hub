@@ -34,7 +34,7 @@
 
 ## 3. Self-Score Against Marking Rubric (10 Points)
 
-- **All proposed screens present and navigable (3 / 3):** Every screen from `PROPOSAL.md` is implemented and reachable through `go_router` with parameterized detail routes (`/jobs/:jobId`, `/jobs/:jobId/apply`, `/employer/vacancies/:vacancyId`, `/employer/vacancies/:vacancyId/applicants`, `/messages/:conversationId`), a job-seeker bottom `NavigationBar`, and an employer `Drawer`.
+- **All proposed screens present and navigable (3 / 3):** Every screen from `PROPOSAL.md` is implemented and reachable through `go_router` with parameterized detail routes (`/jobs/:jobId`, `/jobs/:jobId/apply`, `/employer/vacancies/:vacancyId`, `/employer/vacancies/:vacancyId/applicants`, `/messages/:conversationId`), a job-seeker bottom `NavigationBar` and `Drawer` (including Profile, My CV, Nearby Jobs Map, Settings, and Sign Out), an employer `Drawer`, and Apply/Save/Message actions on `JobDetailsScreen`.
 - **Feature-first structure; state in providers, not widgets (2 / 2):** All code follows `lib/core` and `lib/features/<feature>/{domain,data,presentation}` with `freezed` models, repository interfaces with in-memory implementations, and Riverpod providers managing application state.
 - **Tests present; analyzer and tests clean in the pasted output (1 / 1):** The test suite has 119 passing unit and widget tests, and `flutter analyze --fatal-infos` reports zero issues.
 - **Repository hygiene: branches, pull requests, readable history (1 / 1):** Development was organized into feature branches merged via pull requests (#1–#14 plus `finalizing-milestone-one`) with descriptive commit messages and up-to-date `project.yaml`.
@@ -55,10 +55,10 @@ We will enforce stricter PR review checklists and run `flutter analyze --fatal-i
 ### `flutter analyze --fatal-infos`
 ```text
 Analyzing job_hub...
-No issues found! (ran in 3.8s)
+No issues found! (ran in 2.1s)
 ```
 
 ### `flutter test`
 ```text
-00:15 +119: All tests passed!
+00:14 +119: All tests passed!
 ```
