@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/route_names.dart';
 import '../providers/job_provider.dart';
 import '../widgets/job_card.dart';
 
@@ -23,6 +24,7 @@ class JobSeekerHomeScreen extends ConsumerWidget {
           ),
         ],
       ),
+      bottomNavigationBar: _JobSeekerBottomNav(),
       body: RefreshIndicator(
         onRefresh: () => ref.refresh(jobsProvider.future),
         child: ListView(
@@ -110,6 +112,57 @@ class JobSeekerHomeScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Persistent bottom navigation for the job-seeker flow.
+class _JobSeekerBottomNav extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return NavigationBar(
+      selectedIndex: 0,
+      onDestinationSelected: (index) {
+        switch (index) {
+          case 0:
+            context.go(RouteNames.jobSeekerHome);
+          case 1:
+            context.push(RouteNames.savedJobs);
+          case 2:
+            context.push(RouteNames.myApplications);
+          case 3:
+            context.push(RouteNames.messages);
+          case 4:
+            context.push(RouteNames.notifications);
+        }
+      },
+      destinations: const [
+        NavigationDestination(
+          icon: Icon(Icons.home_outlined),
+          selectedIcon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.bookmark_outline),
+          selectedIcon: Icon(Icons.bookmark),
+          label: 'Saved',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.assignment_outlined),
+          selectedIcon: Icon(Icons.assignment),
+          label: 'Applications',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.chat_bubble_outline),
+          selectedIcon: Icon(Icons.chat_bubble),
+          label: 'Messages',
+        ),
+        NavigationDestination(
+          icon: Icon(Icons.notifications_outlined),
+          selectedIcon: Icon(Icons.notifications),
+          label: 'Alerts',
+        ),
+      ],
     );
   }
 }
