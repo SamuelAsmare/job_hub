@@ -18,6 +18,11 @@ import '../../features/profile/presentation/screens/my_cv_screen.dart';
 import '../../features/saved_jobs/presentation/screens/saved_jobs_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 
+import '../../features/employer/presentation/screens/applicants_screen.dart';
+import '../../features/employer/presentation/screens/employer_dashboard_screen.dart';
+import '../../features/employer/presentation/screens/post_vacancy_screen.dart';
+import '../../features/employer/presentation/screens/vacancy_details_screen.dart';
+
 import '../constants/app_constants.dart';
 import '../providers/app_providers.dart';
 import '../theme/app_colors.dart';
@@ -278,67 +283,35 @@ GoRouter createAppRouter({
         builder: (context, state) => const MyCvScreen(),
       ),
 
-      // --------------------------------------------------
-      // Employer (pending integration)
-      // Keep these routes for the separate Employer PR.
-      // --------------------------------------------------
       GoRoute(
         path: RouteNames.employerDashboard,
         name: RouteNames.employerDashboardName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Employer Dashboard',
-          featurePath:
-              'lib/features/employer/presentation/screens/employer_dashboard_screen.dart',
-          routePath: RouteNames.employerDashboard,
-          description:
-              'Displays recruitment statistics and employer vacancies.',
-        ),
+        builder: (context, state) => const EmployerDashboardScreen(),
       ),
 
       GoRoute(
         path: RouteNames.postVacancy,
         name: RouteNames.postVacancyName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Post / Edit Vacancy',
-          featurePath:
-              'lib/features/employer/presentation/screens/post_vacancy_screen.dart',
-          routePath: RouteNames.postVacancy,
-          description: 'Creates new job vacancies or edits existing ones.',
+        builder: (context, state) => PostVacancyScreen(
+          vacancyId: state.uri.queryParameters['vacancyId'],
         ),
       ),
 
       GoRoute(
         path: RouteNames.vacancyDetails,
         name: RouteNames.vacancyDetailsName,
-        builder: (context, state) {
-          final vacancyId = state.pathParameters['vacancyId'] ?? 'unknown';
-
-          return _PendingFeatureScreen(
-            title: 'Vacancy Details ($vacancyId)',
-            featurePath:
-                'lib/features/employer/presentation/screens/vacancy_details_screen.dart',
-            routePath: RouteNames.vacancyDetailsPath(vacancyId),
-            description: 'Views, edits, or deletes a published vacancy.',
-          );
-        },
+        builder: (context, state) => VacancyDetailsScreen(
+          vacancyId: state.pathParameters['vacancyId']!,
+        ),
       ),
 
       GoRoute(
         path: RouteNames.applicants,
         name: RouteNames.applicantsName,
-        builder: (context, state) {
-          final vacancyId = state.pathParameters['vacancyId'] ?? 'unknown';
-
-          return _PendingFeatureScreen(
-            title: 'Applicants ($vacancyId)',
-            featurePath:
-                'lib/features/employer/presentation/screens/applicants_screen.dart',
-            routePath: RouteNames.applicantsPath(vacancyId),
-            description: 'Reviews applicants and updates application statuses.',
-          );
-        },
+        builder: (context, state) => ApplicantsScreen(
+          vacancyId: state.pathParameters['vacancyId']!,
+        ),
       ),
-
       // --------------------------------------------------
       // Shared routes
       // --------------------------------------------------

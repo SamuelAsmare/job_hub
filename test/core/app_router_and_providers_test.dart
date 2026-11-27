@@ -130,10 +130,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Employer Dashboard (Pending Integration)'),
-        findsOneWidget,
-      );
+     expect(find.text('Employer Dashboard'), findsOneWidget);
     });
   });
 }
