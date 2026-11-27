@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/applications/presentation/screens/apply_job_screen.dart';
 import '../../features/applications/presentation/screens/my_applications_screen.dart';
+import '../../features/authentication/presentation/screens/auth_screen.dart';
+import '../../features/authentication/presentation/screens/welcome_screen.dart';
 import '../../features/jobs/presentation/providers/job_provider.dart';
 import '../../features/jobs/presentation/screens/job_details_screen.dart';
 import '../../features/jobs/presentation/screens/job_search_screen.dart';
@@ -11,6 +13,8 @@ import '../../features/jobs/presentation/screens/job_seeker_home_screen.dart';
 import '../../features/jobs/presentation/screens/nearby_jobs_map_screen.dart';
 import '../../features/messaging/presentation/screens/messages_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
+import '../../features/profile/presentation/screens/job_seeker_profile_screen.dart';
+import '../../features/profile/presentation/screens/my_cv_screen.dart';
 import '../../features/saved_jobs/presentation/screens/saved_jobs_screen.dart';
 import '../../features/settings/presentation/screens/settings_screen.dart';
 
@@ -110,36 +114,63 @@ GoRouter createAppRouter({
       ),
 
       // --------------------------------------------------
-      // Authentication (pending)
+      // Authentication
       // --------------------------------------------------
       GoRoute(
         path: RouteNames.welcome,
         name: RouteNames.welcomeName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Welcome',
-          featurePath:
-              'lib/features/authentication/presentation/screens/welcome_screen.dart',
-          routePath: RouteNames.welcome,
-          description:
-              'Introduces JobHub and provides navigation to login and registration.',
+        builder: (context, state) => WelcomeScreen(
+          onLogin: () {
+            context.push(RouteNames.auth);
+          },
+          onRegister: () {
+            context.push('${RouteNames.auth}?register=true');
+          },
         ),
       ),
 
       GoRoute(
         path: RouteNames.auth,
         name: RouteNames.authName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Login & Registration',
-          featurePath:
-              'lib/features/authentication/presentation/screens/auth_screen.dart',
-          routePath: RouteNames.auth,
-          description:
-              'Authenticates job seekers and employers and sets their role.',
-        ),
+        builder: (context, state) {
+          final isRegistration =
+              state.uri.queryParameters['register'] == 'true';
+
+          return Consumer(
+            builder: (context, ref, child) {
+              return AuthScreen(
+                isRegistration: isRegistration,
+                onBack: () {
+                  context.go(RouteNames.welcome);
+                },
+                onSwitchMode: () {
+                  if (isRegistration) {
+                    context.go(RouteNames.auth);
+                  } else {
+                    context.go('${RouteNames.auth}?register=true');
+                  }
+                },
+                onAuthenticated: (user) {
+                  final role = user.role.name == 'employer'
+                      ? UserRole.employer
+                      : UserRole.jobSeeker;
+
+                  ref.read(appSessionProvider.notifier).switchRole(role);
+
+                  if (role == UserRole.employer) {
+                    context.go(RouteNames.employerDashboard);
+                  } else {
+                    context.go(RouteNames.jobSeekerHome);
+                  }
+                },
+              );
+            },
+          );
+        },
       ),
 
       // --------------------------------------------------
-      // Job Seeker (submitted)
+      // Job Seeker
       // --------------------------------------------------
       GoRoute(
         path: RouteNames.jobSeekerHome,
@@ -238,31 +269,18 @@ GoRouter createAppRouter({
       ),
 
       // --------------------------------------------------
-      // Profile (pending)
+      // Profile
       // --------------------------------------------------
       GoRoute(
         path: RouteNames.jobSeekerProfile,
         name: RouteNames.jobSeekerProfileName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'Job Seeker Profile',
-          featurePath:
-              'lib/features/profile/presentation/screens/job_seeker_profile_screen.dart',
-          routePath: RouteNames.jobSeekerProfile,
-          description:
-              'Manages personal details, skills, education, and experience.',
-        ),
+        builder: (context, state) => const JobSeekerProfileScreen(),
       ),
 
       GoRoute(
         path: RouteNames.myCv,
         name: RouteNames.myCvName,
-        builder: (context, state) => const _PendingFeatureScreen(
-          title: 'My CV',
-          featurePath:
-              'lib/features/profile/presentation/screens/my_cv_screen.dart',
-          routePath: RouteNames.myCv,
-          description: 'Uploads, previews, and replaces the saved CV document.',
-        ),
+        builder: (context, state) => const MyCvScreen(),
       ),
 
       GoRoute(
@@ -295,7 +313,7 @@ GoRouter createAppRouter({
         ),
       ),
       // --------------------------------------------------
-      // Shared routes (submitted)
+      // Shared routes
       // --------------------------------------------------
       GoRoute(
         path: RouteNames.messages,
@@ -502,7 +520,7 @@ class _IntegrationHubScreen extends ConsumerWidget {
               const SizedBox(height: AppConstants.sectionSpacing),
 
               const Text(
-                'Pending Feature Routes',
+                'Available & Pending Feature Routes',
                 style: AppTextStyles.sectionHeading,
               ),
               const SizedBox(height: 10),
@@ -511,28 +529,28 @@ class _IntegrationHubScreen extends ConsumerWidget {
                 icon: Icons.waving_hand_outlined,
                 title: 'Welcome',
                 subtitle: RouteNames.welcome,
-                isReady: false,
+                isReady: true,
                 onTap: () => context.push(RouteNames.welcome),
               ),
               _RouteTile(
                 icon: Icons.login_outlined,
                 title: 'Login / Registration',
                 subtitle: RouteNames.auth,
-                isReady: false,
+                isReady: true,
                 onTap: () => context.push(RouteNames.auth),
               ),
               _RouteTile(
                 icon: Icons.person_outline,
                 title: 'Job Seeker Profile',
                 subtitle: RouteNames.jobSeekerProfile,
-                isReady: false,
+                isReady: true,
                 onTap: () => context.push(RouteNames.jobSeekerProfile),
               ),
               _RouteTile(
                 icon: Icons.description_outlined,
                 title: 'My CV',
                 subtitle: RouteNames.myCv,
-                isReady: false,
+                isReady: true,
                 onTap: () => context.push(RouteNames.myCv),
               ),
               _RouteTile(
