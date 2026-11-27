@@ -59,7 +59,7 @@ class AppSessionState {
 /// repository / Firebase listener can update this notifier directly.
 class AppSessionNotifier extends Notifier<AppSessionState> {
   @override
-  AppSessionState build() => const AppSessionState.sampleJobSeeker();
+  AppSessionState build() => const AppSessionState(); // start as guest → Welcome screen
 
   /// Signs in a user with the given [userId] and [role].
   void signIn({

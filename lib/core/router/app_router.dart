@@ -12,6 +12,7 @@ import '../../features/jobs/presentation/screens/job_search_screen.dart';
 import '../../features/jobs/presentation/screens/job_seeker_home_screen.dart';
 import '../../features/jobs/presentation/screens/nearby_jobs_map_screen.dart';
 import '../../features/messaging/presentation/screens/messages_screen.dart';
+import '../../features/messaging/presentation/screens/chat_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/profile/presentation/screens/job_seeker_profile_screen.dart';
 import '../../features/profile/presentation/screens/my_cv_screen.dart';
@@ -54,14 +55,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
 /// Standalone router instance.
 final GoRouter appRouter = createAppRouter(
-  readSession: () => const AppSessionState.sampleJobSeeker(),
+  readSession: () => const AppSessionState(),
 );
 
 /// Creates the application router.
 GoRouter createAppRouter({
   required AppSessionState Function() readSession,
   Listenable? refreshListenable,
-  String initialLocation = RouteNames.home,
+  String initialLocation = RouteNames.welcome,
 }) {
   return GoRouter(
     initialLocation: initialLocation,
@@ -76,11 +77,21 @@ GoRouter createAppRouter({
         RouteNames.auth,
       };
 
+      // Unauthenticated users may only visit public routes
       if (!session.isAuthenticated && !publicLocations.contains(location)) {
         return RouteNames.welcome;
       }
 
       if (session.isAuthenticated) {
+        // Authenticated users landing on welcome/auth/home → send to their home
+        if (location == RouteNames.welcome ||
+            location == RouteNames.auth ||
+            location == RouteNames.home) {
+          return session.role == UserRole.employer
+              ? RouteNames.employerDashboard
+              : RouteNames.jobSeekerHome;
+        }
+
         final isEmployerRoute = location == RouteNames.employerDashboard ||
             location.startsWith('${RouteNames.employerDashboard}/');
 
@@ -329,6 +340,24 @@ GoRouter createAppRouter({
       ),
 
       GoRoute(
+        path: RouteNames.chat,
+        name: RouteNames.chatName,
+        builder: (context, state) {
+          final conversationId = state.pathParameters['conversationId']!;
+          return Consumer(
+            builder: (context, ref, child) {
+              final userId = ref.watch(currentUserIdProvider) ??
+                  AppConstants.defaultSampleUserId;
+              return ChatLoadingScreen(
+                conversationId: conversationId,
+                currentUserId: userId,
+              );
+            },
+          );
+        },
+      ),
+
+      GoRoute(
         path: RouteNames.notifications,
         name: RouteNames.notificationsName,
         builder: (context, state) => const NotificationsScreen(),
@@ -381,7 +410,7 @@ class _IntegrationHubScreen extends ConsumerWidget {
               AppConstants.pageHorizontalPadding,
             ),
             children: [
-              Text(
+              const Text(
                 'CORE & INTEGRATION',
                 style: AppTextStyles.eyebrow,
               ),
