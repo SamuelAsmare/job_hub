@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/router/route_names.dart';
 import '../providers/job_provider.dart';
 import '../widgets/job_card.dart';
 
@@ -36,6 +37,13 @@ class _JobSearchScreenState extends ConsumerState<JobSearchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Jobs'),
+        actions: [
+          IconButton(
+            onPressed: () => context.push(RouteNames.nearbyJobsMap),
+            icon: const Icon(Icons.map_outlined),
+            tooltip: 'Nearby jobs map',
+          ),
+        ],
       ),
       body: Column(
         children: [
