@@ -636,39 +636,4 @@ class _RouteTile extends StatelessWidget {
   }
 }
 
-// ======================================================
-// Pending Feature Placeholder
-// ======================================================
 
-class _PendingFeatureScreen extends StatelessWidget {
-  final String title;
-  final String featurePath;
-  final String routePath;
-  final String description;
-
-  const _PendingFeatureScreen({
-    required this.title,
-    required this.featurePath,
-    required this.routePath,
-    required this.description,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(title),
-      ),
-      body: EmptyStateWidget(
-        icon: Icons.construction_rounded,
-        title: '$title (Pending Integration)',
-        message: '$description\n\nRoute: $routePath\nTarget file: $featurePath',
-        action: AppButton(
-          text: 'Back to Hub',
-          icon: Icons.arrow_back_rounded,
-          onPressed: () => context.go(RouteNames.home),
-        ),
-      ),
-    );
-  }
-}
