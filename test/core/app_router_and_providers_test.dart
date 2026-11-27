@@ -91,7 +91,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-      expect(find.text('Welcome (Pending Integration)'), findsOneWidget);
+     expect(find.text('Find Your Next Opportunity'), findsOneWidget);
     });
 
     testWidgets('redirects jobSeeker away from employer routes',
@@ -137,3 +137,4 @@ void main() {
     });
   });
 }
+
