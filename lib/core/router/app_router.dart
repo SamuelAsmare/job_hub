@@ -13,6 +13,7 @@ import '../../features/jobs/presentation/screens/job_seeker_home_screen.dart';
 import '../../features/jobs/presentation/screens/nearby_jobs_map_screen.dart';
 import '../../features/messaging/presentation/screens/messages_screen.dart';
 import '../../features/messaging/presentation/screens/chat_screen.dart';
+import '../../features/messaging/presentation/screens/start_conversation_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/profile/presentation/screens/job_seeker_profile_screen.dart';
 import '../../features/profile/presentation/screens/my_cv_screen.dart';
@@ -68,14 +69,26 @@ GoRouter createAppRouter({
     redirect: (context, state) {
       final session = readSession();
       final location = state.matchedLocation;
+      final isGuestBrowsableRoute = location == RouteNames.jobSearch ||
+          RegExp(r'^/jobs/[^/]+$').hasMatch(location);
 
       const publicLocations = {
         RouteNames.welcome,
         RouteNames.auth,
       };
 
-      // Unauthenticated users may only visit public routes
-      if (!session.isAuthenticated && !publicLocations.contains(location)) {
+      if (!session.isAuthenticated &&
+          RegExp(r'^/jobs/[^/]+/(apply|message)$').hasMatch(location)) {
+        return Uri(
+          path: RouteNames.auth,
+          queryParameters: {'redirect': state.uri.toString()},
+        ).toString();
+      }
+
+      // Guests can browse jobs but need an account to use member features.
+      if (!session.isAuthenticated &&
+          !publicLocations.contains(location) &&
+          !isGuestBrowsableRoute) {
         return RouteNames.welcome;
       }
 
@@ -134,6 +147,7 @@ GoRouter createAppRouter({
           onRegister: () {
             context.push('${RouteNames.auth}?register=true');
           },
+          onBrowseJobs: () => context.push(RouteNames.jobSearch),
         ),
       ),
 
@@ -143,6 +157,7 @@ GoRouter createAppRouter({
         builder: (context, state) {
           final isRegistration =
               state.uri.queryParameters['register'] == 'true';
+          final redirectLocation = state.uri.queryParameters['redirect'];
 
           return Consumer(
             builder: (context, ref, child) {
@@ -153,9 +168,26 @@ GoRouter createAppRouter({
                 },
                 onSwitchMode: () {
                   if (isRegistration) {
-                    context.go(RouteNames.auth);
+                    context.go(
+                      Uri(
+                        path: RouteNames.auth,
+                        queryParameters: {
+                          if (redirectLocation != null)
+                            'redirect': redirectLocation,
+                        },
+                      ).toString(),
+                    );
                   } else {
-                    context.go('${RouteNames.auth}?register=true');
+                    context.go(
+                      Uri(
+                        path: RouteNames.auth,
+                        queryParameters: {
+                          'register': 'true',
+                          if (redirectLocation != null)
+                            'redirect': redirectLocation,
+                        },
+                      ).toString(),
+                    );
                   }
                 },
                 onAuthenticated: (user) {
@@ -163,10 +195,16 @@ GoRouter createAppRouter({
                       ? UserRole.employer
                       : UserRole.jobSeeker;
 
-                  ref.read(appSessionProvider.notifier).switchRole(role);
+                  ref.read(appSessionProvider.notifier).signIn(
+                        userId: user.id,
+                        role: role,
+                      );
 
                   if (role == UserRole.employer) {
                     context.go(RouteNames.employerDashboard);
+                  } else if (redirectLocation != null &&
+                      redirectLocation.startsWith('/')) {
+                    context.go(redirectLocation);
                   } else {
                     context.go(RouteNames.jobSeekerHome);
                   }
@@ -206,6 +244,14 @@ GoRouter createAppRouter({
 
           return JobDetailsScreen(jobId: jobId);
         },
+      ),
+
+      GoRoute(
+        path: RouteNames.startConversation,
+        name: RouteNames.startConversationName,
+        builder: (context, state) => StartConversationScreen(
+          jobId: state.pathParameters['jobId']!,
+        ),
       ),
 
       GoRoute(

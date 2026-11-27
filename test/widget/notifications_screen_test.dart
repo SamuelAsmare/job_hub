@@ -6,6 +6,7 @@ import 'package:job_hub/features/notifications/domain/models/notification.dart';
 import 'package:job_hub/features/notifications/domain/repositories/notification_repository.dart';
 import 'package:job_hub/features/notifications/presentation/providers/notification_provider.dart';
 import 'package:job_hub/features/notifications/presentation/screens/notifications_screen.dart';
+import 'package:job_hub/core/theme/app_theme.dart';
 
 class FailingNotificationRepository implements NotificationRepository {
   @override
@@ -59,7 +60,9 @@ void main() {
       );
     }
 
-    testWidgets('renders populated notifications with distinguishably styled unread items', (tester) async {
+    testWidgets(
+        'renders populated notifications with distinguishably styled unread items',
+        (tester) async {
       final repository = NotificationRepositoryImpl(
         initialNotifications: [unreadNotification, readNotification],
       );
@@ -73,9 +76,11 @@ void main() {
 
       // Both notification titles and messages appear
       expect(find.text('Interview Scheduled'), findsOneWidget);
-      expect(find.text('Your interview with Google is scheduled for tomorrow.'), findsOneWidget);
+      expect(find.text('Your interview with Google is scheduled for tomorrow.'),
+          findsOneWidget);
       expect(find.text('Welcome to JobHub'), findsOneWidget);
-      expect(find.text('Explore open vacancies and apply today.'), findsOneWidget);
+      expect(
+          find.text('Explore open vacancies and apply today.'), findsOneWidget);
 
       // Unread badge indicator
       expect(find.text('1 new'), findsOneWidget);
@@ -87,7 +92,8 @@ void main() {
       expect(find.text('Mark all read'), findsOneWidget);
     });
 
-    testWidgets('tapping individual mark as read marks notification as read', (tester) async {
+    testWidgets('tapping individual mark as read marks notification as read',
+        (tester) async {
       final repository = NotificationRepositoryImpl(
         initialNotifications: [unreadNotification],
       );
@@ -105,7 +111,8 @@ void main() {
       expect(find.text('Mark all read'), findsNothing);
     });
 
-    testWidgets('tapping mark all read marks all notifications as read', (tester) async {
+    testWidgets('tapping mark all read marks all notifications as read',
+        (tester) async {
       final repository = NotificationRepositoryImpl(
         initialNotifications: [unreadNotification],
       );
@@ -122,7 +129,8 @@ void main() {
       expect(find.text('Mark as read'), findsNothing);
     });
 
-    testWidgets('renders empty state when there are no notifications', (tester) async {
+    testWidgets('renders empty state when there are no notifications',
+        (tester) async {
       final repository = NotificationRepositoryImpl(
         initialNotifications: [],
       );
@@ -132,13 +140,39 @@ void main() {
 
       expect(find.text('No notifications yet'), findsOneWidget);
       expect(
-        find.text('We will notify you about updates to your job applications and recruiter messages.'),
+        find.text(
+            'We will notify you about updates to your job applications and recruiter messages.'),
         findsOneWidget,
       );
       expect(find.byIcon(Icons.notifications_none_rounded), findsOneWidget);
     });
 
-    testWidgets('renders error state and retry button on failure', (tester) async {
+    testWidgets('notifications empty state uses dark theme colors',
+        (tester) async {
+      final repository = NotificationRepositoryImpl(initialNotifications: []);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            notificationRepositoryProvider.overrideWithValue(repository),
+            currentNotificationUserIdProvider.overrideWithValue('user_001'),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.dark,
+            home: const NotificationsScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final title = tester.widget<Text>(find.text('Notifications'));
+      expect(title.style?.color, AppTheme.darkTheme.colorScheme.onSurface);
+    });
+
+    testWidgets('renders error state and retry button on failure',
+        (tester) async {
       final failingRepository = FailingNotificationRepository();
 
       await tester.pumpWidget(createWidgetUnderTest(failingRepository));

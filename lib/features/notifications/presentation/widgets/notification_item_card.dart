@@ -30,21 +30,24 @@ class NotificationItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isUnread = !notification.isRead;
+    final colors = Theme.of(context).colorScheme;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isUnread ? const Color(0xFF286BE8).withValues(alpha: 0.35) : const Color(0xFFD6E2F5),
+          color: isUnread
+              ? colors.primary.withValues(alpha: 0.45)
+              : colors.outlineVariant,
           width: isUnread ? 1.5 : 1.0,
         ),
         boxShadow: [
           BoxShadow(
             color: isUnread
-                ? const Color(0xFF286BE8).withValues(alpha: 0.08)
-                : const Color(0xFF14264F).withValues(alpha: 0.04),
+                ? colors.primary.withValues(alpha: 0.10)
+                : colors.shadow.withValues(alpha: 0.06),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -72,8 +75,8 @@ class NotificationItemCard extends StatelessWidget {
                           Container(
                             width: 8,
                             height: 8,
-                            decoration: const BoxDecoration(
-                              color: Color(0xFF286BE8),
+                            decoration: BoxDecoration(
+                              color: colors.primary,
                               shape: BoxShape.circle,
                             ),
                           ),
@@ -82,9 +85,9 @@ class NotificationItemCard extends StatelessWidget {
                     ),
                     Text(
                       _formatTimestamp(notification.createdAt),
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF7485A3),
+                        color: colors.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -96,16 +99,16 @@ class NotificationItemCard extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: isUnread ? FontWeight.w700 : FontWeight.w600,
-                    color: const Color(0xFF14264F),
+                    color: colors.onSurface,
                   ),
                 ),
                 const SizedBox(height: 6),
                 Text(
                   notification.message,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     height: 1.4,
-                    color: Color(0xFF536584),
+                    color: colors.onSurfaceVariant,
                   ),
                 ),
                 if (isUnread) ...[
@@ -115,8 +118,9 @@ class NotificationItemCard extends StatelessWidget {
                     child: TextButton.icon(
                       style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact,
-                        foregroundColor: const Color(0xFF286BE8),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        foregroundColor: colors.primary,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
                       ),
                       onPressed: onMarkAsRead,
                       icon: const Icon(Icons.done_rounded, size: 16),

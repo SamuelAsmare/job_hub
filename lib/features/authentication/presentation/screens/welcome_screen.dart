@@ -5,10 +5,12 @@ class WelcomeScreen extends StatelessWidget {
     super.key,
     required this.onLogin,
     required this.onRegister,
+    required this.onBrowseJobs,
   });
 
   final VoidCallback onLogin;
   final VoidCallback onRegister;
+  final VoidCallback onBrowseJobs;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +67,11 @@ class WelcomeScreen extends StatelessWidget {
                       onPressed: onLogin,
                       child: const Text('Sign In'),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: onBrowseJobs,
+                    child: const Text('Browse jobs as guest'),
                   ),
                   const SizedBox(height: 32),
                   Text(

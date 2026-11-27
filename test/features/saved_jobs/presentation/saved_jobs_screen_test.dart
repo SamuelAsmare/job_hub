@@ -7,6 +7,7 @@ import 'package:job_hub/features/saved_jobs/domain/models/saved_job.dart';
 import 'package:job_hub/features/saved_jobs/presentation/providers/saved_job_provider.dart';
 import 'package:job_hub/features/saved_jobs/presentation/screens/saved_jobs_screen.dart';
 import 'package:job_hub/features/saved_jobs/presentation/widgets/saved_job_card.dart';
+import 'package:job_hub/core/theme/app_theme.dart';
 
 void main() {
   Widget buildTestableWidget({
@@ -36,6 +37,30 @@ void main() {
 
       expect(find.text('No Saved Jobs Yet'), findsOneWidget);
       expect(find.byType(SavedJobCard), findsNothing);
+    });
+
+    testWidgets('saved jobs empty state uses dark theme colors',
+        (tester) async {
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            savedJobRepositoryProvider.overrideWithValue(
+              SavedJobRepositoryImpl(initialSavedJobs: []),
+            ),
+            currentUserIdProvider.overrideWithValue('user_001'),
+          ],
+          child: MaterialApp(
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            themeMode: ThemeMode.dark,
+            home: const SavedJobsScreen(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final title = tester.widget<Text>(find.text('Saved Jobs'));
+      expect(title.style?.color, AppTheme.darkTheme.colorScheme.onSurface);
     });
 
     testWidgets('The screen displays saved jobs', (tester) async {

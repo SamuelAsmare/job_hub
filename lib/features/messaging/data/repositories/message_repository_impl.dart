@@ -1,4 +1,3 @@
-
 import '../../domain/models/conversation.dart';
 import '../../domain/models/message.dart';
 import '../../domain/repositories/message_repository.dart';
@@ -8,6 +7,21 @@ class MessageRepositoryImpl implements MessageRepository {
   MessageRepositoryImpl(this._dataSource);
 
   final MessageLocalDataSource _dataSource;
+
+  @override
+  Future<Conversation> getOrCreateConversation({
+    required String currentUserId,
+    required String currentUserName,
+    required String otherUserId,
+    required String otherUserName,
+  }) {
+    return _dataSource.getOrCreateConversation(
+      currentUserId: currentUserId,
+      currentUserName: currentUserName,
+      otherUserId: otherUserId,
+      otherUserName: otherUserName,
+    );
+  }
 
   @override
   Future<List<Conversation>> getConversations(String userId) {

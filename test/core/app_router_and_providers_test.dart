@@ -63,6 +63,10 @@ void main() {
       expect(RouteNames.jobDetailsPath('job_42'), '/jobs/job_42');
       expect(RouteNames.applyJobPath('job_42'), '/jobs/job_42/apply');
       expect(
+        RouteNames.startConversationPath('job_42'),
+        '/jobs/job_42/message',
+      );
+      expect(
         RouteNames.vacancyDetailsPath('vac_7'),
         '/employer/vacancies/vac_7',
       );
@@ -87,7 +91,133 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-     expect(find.text('Find Your Next Opportunity'), findsOneWidget);
+      expect(find.text('Find Your Next Opportunity'), findsOneWidget);
+    });
+
+    testWidgets('allows guests to browse job search', (tester) async {
+      final router = createAppRouter(
+        readSession: () => const AppSessionState(),
+        initialLocation: RouteNames.jobSearch,
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Search Jobs'), findsOneWidget);
+    });
+
+    testWidgets('allows guests to view job details', (tester) async {
+      final router = createAppRouter(
+        readSession: () => const AppSessionState(),
+        initialLocation: RouteNames.jobDetailsPath('job_001'),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Job Details'), findsOneWidget);
+      expect(find.text('Senior Flutter Developer'), findsOneWidget);
+    });
+
+    testWidgets('redirects guest applications to sign in and keeps return path',
+        (tester) async {
+      final router = createAppRouter(
+        readSession: () => const AppSessionState(),
+        initialLocation: RouteNames.applyJobPath('job_001'),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(
+        router.routeInformationProvider.value.uri.queryParameters['redirect'],
+        RouteNames.applyJobPath('job_001'),
+      );
+    });
+
+    testWidgets('redirects guest employer messages to sign in and keeps job',
+        (tester) async {
+      final router = createAppRouter(
+        readSession: () => const AppSessionState(),
+        initialLocation: RouteNames.startConversationPath('job_001'),
+      );
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(
+        router.routeInformationProvider.value.uri.queryParameters['redirect'],
+        RouteNames.startConversationPath('job_001'),
+      );
+    });
+
+    testWidgets('sign in after guest apply returns to the application form',
+        (tester) async {
+      final container = ProviderContainer();
+      addTearDown(container.dispose);
+      final router = container.read(appRouterProvider);
+
+      await tester.pumpWidget(
+        UncontrolledProviderScope(
+          container: container,
+          child: MaterialApp.router(routerConfig: router),
+        ),
+      );
+      await tester.pumpAndSettle();
+      router.go(RouteNames.applyJobPath('job_001'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      final createAccount = find.text('New to JobHub? Create Account');
+      await tester.ensureVisible(createAccount);
+      await tester.tap(createAccount);
+      await tester.pumpAndSettle();
+      expect(find.text('Join JobHub'), findsOneWidget);
+      expect(
+        router.routeInformationProvider.value.uri.queryParameters['redirect'],
+        RouteNames.applyJobPath('job_001'),
+      );
+
+      final switchToSignIn = find.text('Already have an account? Sign In');
+      await tester.ensureVisible(switchToSignIn);
+      await tester.tap(switchToSignIn);
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.byType(TextFormField).at(0),
+        'abebe@example.com',
+      );
+      await tester.enterText(
+        find.byType(TextFormField).at(1),
+        'password123',
+      );
+      final signInButton = find.byType(FilledButton);
+      await tester.ensureVisible(signInButton);
+      await tester.tap(signInButton);
+      await tester.pumpAndSettle();
+
+      expect(
+        router.routeInformationProvider.value.uri.path,
+        RouteNames.applyJobPath('job_001'),
+      );
+      expect(find.text('Choose PDF or DOCX'), findsOneWidget);
     });
 
     testWidgets('redirects jobSeeker away from employer routes',
@@ -126,8 +256,7 @@ void main() {
       );
       await tester.pumpAndSettle();
 
-     expect(find.text('Employer Dashboard'), findsOneWidget);
+      expect(find.text('Employer Dashboard'), findsOneWidget);
     });
   });
 }
-

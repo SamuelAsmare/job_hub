@@ -58,6 +58,54 @@ void main() {
   });
 
   group('MessageRepository', () {
+    test('creates a conversation between two users', () async {
+      final conversation = await repository.getOrCreateConversation(
+        currentUserId: 'new-seeker',
+        currentUserName: 'New Seeker',
+        otherUserId: 'new-employer',
+        otherUserName: 'New Employer',
+      );
+
+      expect(conversation.participantOneId, 'new-seeker');
+      expect(conversation.participantTwoId, 'new-employer');
+      expect(conversation.participantOneName, 'New Seeker');
+      expect(conversation.participantTwoName, 'New Employer');
+      expect(
+        await repository.getConversations('new-seeker'),
+        contains(conversation),
+      );
+    });
+
+    test('reuses an existing conversation for the same participants', () async {
+      final first = await repository.getOrCreateConversation(
+        currentUserId: 'user-1',
+        currentUserName: 'Job Seeker',
+        otherUserId: 'user-2',
+        otherUserName: 'Employer',
+      );
+      final second = await repository.getOrCreateConversation(
+        currentUserId: 'user-2',
+        currentUserName: 'Employer',
+        otherUserId: 'user-1',
+        otherUserName: 'Job Seeker',
+      );
+
+      expect(second.id, first.id);
+      expect(await repository.getConversations('user-1'), hasLength(1));
+    });
+
+    test('rejects a conversation with the same participant twice', () async {
+      expect(
+        () => repository.getOrCreateConversation(
+          currentUserId: 'user-1',
+          currentUserName: 'Job Seeker',
+          otherUserId: 'user-1',
+          otherUserName: 'Job Seeker',
+        ),
+        throwsArgumentError,
+      );
+    });
+
     test('loads conversations belonging to a user', () async {
       final conversations = await repository.getConversations('user-1');
 
