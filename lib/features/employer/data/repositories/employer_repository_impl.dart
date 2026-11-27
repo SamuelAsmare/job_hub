@@ -43,7 +43,7 @@ class EmployerRepositoryImpl implements EmployerRepository {
   }
 
   @override
-  Future<void> createVacancy(Job vacancy) async {
+  Future<Job> createVacancy(Job vacancy) async {
     final newVacancy = Job(
       id: 'vacancy_${DateTime.now().microsecondsSinceEpoch}',
       title: vacancy.title,
@@ -62,6 +62,7 @@ class EmployerRepositoryImpl implements EmployerRepository {
     );
 
     await _dataSource.addVacancy(newVacancy);
+    return newVacancy;
   }
 
   @override
