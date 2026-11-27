@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart' hide Notification;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../providers/notification_provider.dart';
 import '../widgets/notification_item_card.dart';
@@ -209,7 +210,14 @@ class NotificationsScreen extends ConsumerWidget {
                 size: 18,
                 color: Color(0xFF14264F),
               ),
-              onPressed: () => Navigator.of(context).maybePop(),
+              onPressed: () {
+                final router = GoRouter.maybeOf(context);
+                if (router != null) {
+                  if (router.canPop()) router.pop();
+                } else {
+                  Navigator.of(context).maybePop();
+                }
+              },
             ),
           ),
           if (hasUnread)

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../domain/models/app_settings.dart';
 import '../providers/settings_provider.dart';
 
@@ -122,7 +123,10 @@ class SettingsScreen extends ConsumerWidget {
                 color: primaryNavy,
               ),
               onPressed: () {
-                if (Navigator.of(context).canPop()) {
+                final router = GoRouter.maybeOf(context);
+                if (router != null) {
+                  if (router.canPop()) router.pop();
+                } else if (Navigator.of(context).canPop()) {
                   Navigator.of(context).pop();
                 }
               },

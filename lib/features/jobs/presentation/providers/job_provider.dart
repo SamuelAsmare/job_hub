@@ -48,6 +48,21 @@ final jobSearchProvider =
   return repository.searchJobs(query);
 });
 
+/// Manages the active search query string in Riverpod instead of widget state.
+class JobSearchQueryNotifier extends Notifier<String> {
+  @override
+  String build() => '';
+
+  void setQuery(String value) => state = value.trim();
+
+  void clear() => state = '';
+}
+
+final jobSearchQueryProvider =
+    NotifierProvider<JobSearchQueryNotifier, String>(
+  JobSearchQueryNotifier.new,
+);
+
 // Provides jobs posted by a specific employer.
 final jobsByEmployerProvider =
     FutureProvider.family<List<Job>, String>((ref, employerId) {

@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../jobs/domain/models/job.dart';
 import '../../domain/models/application.dart';
@@ -151,7 +152,12 @@ class _ApplyJobScreenState extends ConsumerState<ApplyJobScreen> {
         ),
       );
 
-      Navigator.of(context).pop(true);
+      final router = GoRouter.maybeOf(context);
+      if (router != null) {
+        if (router.canPop()) router.pop(true);
+      } else {
+        Navigator.of(context).pop(true);
+      }
     } catch (error) {
       if (!mounted) return;
 
