@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../jobs/domain/models/job.dart';
+import '../../../profile/presentation/providers/profile_provider.dart';
 import '../../domain/models/application.dart';
 import '../providers/application_provider.dart';
 
@@ -26,8 +27,23 @@ class _ApplyJobScreenState extends ConsumerState<ApplyJobScreen> {
   final _coverLetterController = TextEditingController();
 
   PlatformFile? _selectedCv;
+  bool _dismissedSavedCv = false;
   bool _isSubmitting = false;
   bool _isRequestingAiReview = false;
+
+  String? _activeSavedCvUrl() {
+    if (_selectedCv != null || _dismissedSavedCv) return null;
+    final cvUrl = ref.read(profileProvider).value?.cvUrl;
+    if (cvUrl == null || cvUrl.trim().isEmpty) return null;
+    return cvUrl.trim();
+  }
+
+  String _fileNameFromPath(String path) {
+    final segments = path.split(RegExp(r'[/\\]'));
+    return segments.isNotEmpty && segments.last.isNotEmpty
+        ? segments.last
+        : path;
+  }
 
   @override
   void dispose() {
@@ -59,7 +75,7 @@ class _ApplyJobScreenState extends ConsumerState<ApplyJobScreen> {
   }
 
   Future<void> _requestAiReview() async {
-    if (_selectedCv == null) {
+    if (_selectedCv == null && _activeSavedCvUrl() == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select your CV first.')),
       );
@@ -94,7 +110,8 @@ class _ApplyJobScreenState extends ConsumerState<ApplyJobScreen> {
       return;
     }
 
-    if (_selectedCv == null) {
+    final savedCvUrl = _activeSavedCvUrl();
+    if (_selectedCv == null && savedCvUrl == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select your CV.')),
       );
@@ -124,8 +141,12 @@ class _ApplyJobScreenState extends ConsumerState<ApplyJobScreen> {
         jobTitle: widget.job.title,
         companyName: widget.job.companyName,
         applicantId: widget.applicantId,
-        cvReference: _selectedCv!.path ?? _selectedCv!.name,
-        cvFileName: _selectedCv!.name,
+        cvReference: _selectedCv != null
+            ? (_selectedCv!.path ?? _selectedCv!.name)
+            : savedCvUrl!,
+        cvFileName: _selectedCv != null
+            ? _selectedCv!.name
+            : _fileNameFromPath(savedCvUrl!),
         coverLetter: _coverLetterController.text.trim(),
         appliedAt: DateTime.now(),
         status: ApplicationStatus.pending,
@@ -175,6 +196,14 @@ class _ApplyJobScreenState extends ConsumerState<ApplyJobScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profileCvUrl = ref.watch(profileProvider).value?.cvUrl?.trim();
+    final savedCvUrl = (_selectedCv == null &&
+            !_dismissedSavedCv &&
+            profileCvUrl != null &&
+            profileCvUrl.isNotEmpty)
+        ? profileCvUrl
+        : null;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Apply for Job'),
@@ -218,6 +247,23 @@ class _ApplyJobScreenState extends ConsumerState<ApplyJobScreen> {
                         : () {
                             setState(() {
                               _selectedCv = null;
+                            });
+                          },
+                    icon: const Icon(Icons.close),
+                  ),
+                ),
+              ] else if (savedCvUrl != null) ...[
+                const SizedBox(height: 10),
+                ListTile(
+                  leading: const Icon(Icons.description),
+                  title: Text(_fileNameFromPath(savedCvUrl)),
+                  subtitle: const Text('Saved CV from My CV'),
+                  trailing: IconButton(
+                    onPressed: _isSubmitting
+                        ? null
+                        : () {
+                            setState(() {
+                              _dismissedSavedCv = true;
                             });
                           },
                     icon: const Icon(Icons.close),
