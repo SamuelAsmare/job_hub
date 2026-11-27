@@ -204,23 +204,6 @@ class SettingsScreen extends ConsumerWidget {
         _buildCard(
           children: [
             _buildDropdownTile(
-              title: 'Language',
-              subtitle: 'Select application language',
-              value: settings.language,
-              icon: Icons.language_rounded,
-              items: const [
-                DropdownMenuItem(value: 'en', child: Text('English')),
-                DropdownMenuItem(value: 'am', child: Text('Amharic (አማርኛ)')),
-                DropdownMenuItem(value: 'om', child: Text('Afaan Oromoo')),
-              ],
-              onChanged: (val) {
-                if (val != null) {
-                  notifier.updateLanguage(val);
-                }
-              },
-            ),
-            const Divider(height: 1, color: inputBorder),
-            _buildDropdownTile(
               title: 'Theme Mode',
               subtitle: 'Choose display theme',
               value: settings.themeMode,

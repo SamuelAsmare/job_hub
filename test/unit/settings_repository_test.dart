@@ -14,7 +14,6 @@ void main() {
             notificationsEnabled: true,
             emailNotificationsEnabled: true,
             pushNotificationsEnabled: false,
-            language: 'en',
             themeMode: 'light',
           ),
           'user_002': const AppSettings(
@@ -22,7 +21,6 @@ void main() {
             notificationsEnabled: false,
             emailNotificationsEnabled: false,
             pushNotificationsEnabled: false,
-            language: 'am',
             themeMode: 'dark',
           ),
         },
@@ -36,7 +34,6 @@ void main() {
       expect(settings?.userId, 'user_001');
       expect(settings?.notificationsEnabled, true);
       expect(settings?.pushNotificationsEnabled, false);
-      expect(settings?.language, 'en');
       expect(settings?.themeMode, 'light');
     });
 
@@ -46,7 +43,6 @@ void main() {
       expect(settings, isNotNull);
       expect(settings?.userId, 'user_new');
       expect(settings?.notificationsEnabled, true);
-      expect(settings?.language, 'en');
       expect(settings?.themeMode, 'light');
     });
 
@@ -56,7 +52,6 @@ void main() {
         notificationsEnabled: false,
         emailNotificationsEnabled: false,
         pushNotificationsEnabled: true,
-        language: 'am',
         themeMode: 'dark',
       );
 
@@ -72,7 +67,6 @@ void main() {
         notificationsEnabled: false,
         emailNotificationsEnabled: false,
         pushNotificationsEnabled: false,
-        language: 'om',
         themeMode: 'system',
       );
 
@@ -81,8 +75,7 @@ void main() {
       final user1 = await repository.getSettings('user_001');
       final user2 = await repository.getSettings('user_002');
 
-      expect(user1?.language, 'om');
-      expect(user2?.language, 'am');
+      expect(user1?.themeMode, 'system');
       expect(user2?.themeMode, 'dark');
       expect(user2?.userId, 'user_002');
     });

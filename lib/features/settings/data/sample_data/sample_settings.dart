@@ -8,7 +8,6 @@ final sampleSettings = <String, AppSettings>{
     notificationsEnabled: true,
     emailNotificationsEnabled: true,
     pushNotificationsEnabled: true,
-    language: 'en',
     themeMode: 'light',
   ),
 };

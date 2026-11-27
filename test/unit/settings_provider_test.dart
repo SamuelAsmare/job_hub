@@ -17,7 +17,6 @@ void main() {
             notificationsEnabled: true,
             emailNotificationsEnabled: true,
             pushNotificationsEnabled: true,
-            language: 'en',
             themeMode: 'light',
           ),
         },
@@ -40,7 +39,6 @@ void main() {
 
       expect(initial.userId, 'user_001');
       expect(initial.notificationsEnabled, true);
-      expect(initial.language, 'en');
       expect(initial.themeMode, 'light');
     });
 
@@ -54,18 +52,6 @@ void main() {
 
       final inRepo = await repository.getSettings('user_001');
       expect(inRepo?.notificationsEnabled, false);
-    });
-
-    test('updateLanguage updates provider state and repository', () async {
-      await container.read(settingsProvider.future);
-
-      await container.read(settingsProvider.notifier).updateLanguage('am');
-
-      final state = container.read(settingsProvider).value;
-      expect(state?.language, 'am');
-
-      final inRepo = await repository.getSettings('user_001');
-      expect(inRepo?.language, 'am');
     });
 
     test('updateThemeMode updates provider state and repository', () async {
