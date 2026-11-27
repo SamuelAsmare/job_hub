@@ -14,8 +14,7 @@ abstract interface class EmployerRepository {
     required String employerId,
     required String vacancyId,
   });
-
-  Future<void> createVacancy(Job vacancy);
+  Future<Job> createVacancy(Job vacancy);
 
   Future<void> updateVacancy(Job vacancy);
 
