@@ -43,6 +43,59 @@ void main() {
       expect(find.text('Email Address'), findsOneWidget);
       expect(find.text('Password'), findsOneWidget);
       expect(find.text('Sign In'), findsWidgets);
+      expect(find.byType(Image), findsNothing);
+    });
+
+    testWidgets('login form remains scrollable on a compact screen',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: AuthScreen(
+              isRegistration: false,
+              onAuthenticated: (_) {},
+              onBack: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Welcome Back'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('registration form remains scrollable on a compact screen',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 640);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+
+      await tester.pumpWidget(
+        ProviderScope(
+          child: MaterialApp(
+            home: AuthScreen(
+              isRegistration: true,
+              onAuthenticated: (_) {},
+              onBack: () {},
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final submitButton = find.byType(FilledButton);
+      await tester.ensureVisible(submitButton);
+
+      expect(find.text('Join JobHub'), findsOneWidget);
+      expect(submitButton, findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
 
     testWidgets('displays registration form', (tester) async {
@@ -67,6 +120,7 @@ void main() {
       expect(find.text('Confirm Password'), findsOneWidget);
       expect(find.text('Job Seeker'), findsOneWidget);
       expect(find.text('Employer'), findsOneWidget);
+      expect(find.byType(Image), findsNothing);
     });
 
     testWidgets('calls onBack when back button is pressed', (tester) async {

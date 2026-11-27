@@ -2,6 +2,13 @@ import '../models/conversation.dart';
 import '../models/message.dart';
 
 abstract interface class MessageRepository {
+  Future<Conversation> getOrCreateConversation({
+    required String currentUserId,
+    required String currentUserName,
+    required String otherUserId,
+    required String otherUserName,
+  });
+
   Future<List<Conversation>> getConversations(String userId);
 
   Future<List<Message>> getMessages(String conversationId);

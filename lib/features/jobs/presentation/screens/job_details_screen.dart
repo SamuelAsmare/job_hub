@@ -64,7 +64,9 @@ class JobDetailsScreen extends ConsumerWidget {
                   child: Row(
                     children: [
                       OutlinedButton.icon(
-                        onPressed: () => context.push(RouteNames.messages),
+                        onPressed: () => context.push(
+                          RouteNames.startConversationPath(job.id),
+                        ),
                         icon: const Icon(Icons.chat_bubble_outline),
                         label: const Text('Message'),
                       ),

@@ -36,16 +36,6 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
 
   bool get _isRegistration => widget.isRegistration;
 
-  String get _illustration {
-    if (!_isRegistration) {
-      return 'assets/images/signin.png';
-    }
-
-    return _selectedRole == UserRole.employer
-        ? 'assets/images/register_company.png'
-        : 'assets/images/register.png';
-  }
-
   @override
   void dispose() {
     _nameController.dispose();
@@ -145,144 +135,141 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         title: Text(_isRegistration ? 'Create Account' : 'Sign In'),
       ),
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      child: Image.asset(
-                        _illustration,
-                        key: ValueKey(_illustration),
-                        height: 180,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      _isRegistration ? 'Join JobHub' : 'Welcome Back',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      _isRegistration
-                          ? 'Create your account and discover new opportunities.'
-                          : 'Sign in to continue your career journey.',
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    if (_isRegistration) ...[
-                      AuthTextField(
-                        controller: _nameController,
-                        label: 'Full Name',
-                        icon: Icons.person_outline,
-                        textInputAction: TextInputAction.next,
-                        validator: _validateName,
-                        autofillHints: const [AutofillHints.name],
-                      ),
-                      const SizedBox(height: 18),
-                    ],
-                    AuthTextField(
-                      controller: _emailController,
-                      label: 'Email Address',
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      validator: _validateEmail,
-                      autofillHints: const [AutofillHints.email],
-                    ),
-                    const SizedBox(height: 18),
-                    AuthTextField(
-                      controller: _passwordController,
-                      label: 'Password',
-                      icon: Icons.lock_outline,
-                      isPassword: true,
-                      textInputAction: _isRegistration
-                          ? TextInputAction.next
-                          : TextInputAction.done,
-                      validator: _validatePassword,
-                      autofillHints: [
-                        _isRegistration
-                            ? AutofillHints.newPassword
-                            : AutofillHints.password,
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 440),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          _isRegistration ? 'Join JobHub' : 'Welcome Back',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.headlineMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          _isRegistration
+                              ? 'Create your account and discover new opportunities.'
+                              : 'Sign in to continue your career journey.',
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+                        if (_isRegistration) ...[
+                          AuthTextField(
+                            controller: _nameController,
+                            label: 'Full Name',
+                            icon: Icons.person_outline,
+                            textInputAction: TextInputAction.next,
+                            validator: _validateName,
+                            autofillHints: const [AutofillHints.name],
+                          ),
+                          const SizedBox(height: 18),
+                        ],
+                        AuthTextField(
+                          controller: _emailController,
+                          label: 'Email Address',
+                          icon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          textInputAction: TextInputAction.next,
+                          validator: _validateEmail,
+                          autofillHints: const [AutofillHints.email],
+                        ),
+                        const SizedBox(height: 18),
+                        AuthTextField(
+                          controller: _passwordController,
+                          label: 'Password',
+                          icon: Icons.lock_outline,
+                          isPassword: true,
+                          textInputAction: _isRegistration
+                              ? TextInputAction.next
+                              : TextInputAction.done,
+                          validator: _validatePassword,
+                          autofillHints: [
+                            _isRegistration
+                                ? AutofillHints.newPassword
+                                : AutofillHints.password,
+                          ],
+                        ),
+                        if (_isRegistration) ...[
+                          const SizedBox(height: 18),
+                          AuthTextField(
+                            controller: _confirmPasswordController,
+                            label: 'Confirm Password',
+                            icon: Icons.lock_reset_outlined,
+                            isPassword: true,
+                            textInputAction: TextInputAction.done,
+                            validator: _validateConfirmPassword,
+                            autofillHints: const [AutofillHints.newPassword],
+                          ),
+                          const SizedBox(height: 24),
+                          AuthRoleSelector(
+                            selectedRole: _selectedRole,
+                            onChanged: (role) {
+                              setState(() => _selectedRole = role);
+                            },
+                          ),
+                        ],
+                        if (authState.errorMessage != null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            authState.errorMessage!,
+                            style: TextStyle(
+                              color: theme.colorScheme.error,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          height: 54,
+                          child: FilledButton(
+                            onPressed: authState.isLoading ? null : _submit,
+                            child: authState.isLoading
+                                ? const SizedBox(
+                                    height: 22,
+                                    width: 22,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    _isRegistration
+                                        ? 'Create Account'
+                                        : 'Sign In',
+                                  ),
+                          ),
+                        ),
+                        if (widget.onSwitchMode != null) ...[
+                          const SizedBox(height: 20),
+                          TextButton(
+                            onPressed: authState.isLoading
+                                ? null
+                                : widget.onSwitchMode,
+                            child: Text(
+                              _isRegistration
+                                  ? 'Already have an account? Sign In'
+                                  : 'New to JobHub? Create Account',
+                            ),
+                          ),
+                        ],
                       ],
                     ),
-                    if (_isRegistration) ...[
-                      const SizedBox(height: 18),
-                      AuthTextField(
-                        controller: _confirmPasswordController,
-                        label: 'Confirm Password',
-                        icon: Icons.lock_reset_outlined,
-                        isPassword: true,
-                        textInputAction: TextInputAction.done,
-                        validator: _validateConfirmPassword,
-                        autofillHints: const [AutofillHints.newPassword],
-                      ),
-                      const SizedBox(height: 24),
-                      AuthRoleSelector(
-                        selectedRole: _selectedRole,
-                        onChanged: (role) {
-                          setState(() => _selectedRole = role);
-                        },
-                      ),
-                    ],
-                    if (authState.errorMessage != null) ...[
-                      const SizedBox(height: 16),
-                      Text(
-                        authState.errorMessage!,
-                        style: TextStyle(
-                          color: theme.colorScheme.error,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                    const SizedBox(height: 28),
-                    SizedBox(
-                      height: 54,
-                      child: FilledButton(
-                        onPressed: authState.isLoading ? null : _submit,
-                        child: authState.isLoading
-                            ? const SizedBox(
-                                height: 22,
-                                width: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : Text(
-                                _isRegistration ? 'Create Account' : 'Sign In',
-                              ),
-                      ),
-                    ),
-                    if (widget.onSwitchMode != null) ...[
-                      const SizedBox(height: 20),
-                      TextButton(
-                        onPressed:
-                            authState.isLoading ? null : widget.onSwitchMode,
-                        child: Text(
-                          _isRegistration
-                              ? 'Already have an account? Sign In'
-                              : 'New to JobHub? Create Account',
-                        ),
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
         ),
       ),
     );

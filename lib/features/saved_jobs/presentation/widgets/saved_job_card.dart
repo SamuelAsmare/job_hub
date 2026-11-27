@@ -13,24 +13,17 @@ class SavedJobCard extends StatelessWidget {
   final VoidCallback onRemove;
   final VoidCallback? onTap;
 
-  static const Color primaryNavy = Color(0xFF14264F);
-  static const Color primaryBlue = Color(0xFF286BE8);
-  static const Color accentCyan = Color(0xFF50CBE0);
-  static const Color paleBlueBackground = Color(0xFFEAF2FF);
-  static const Color secondaryText = Color(0xFF536584);
-  static const Color mutedText = Color(0xFF7485A3);
-  static const Color inputBorder = Color(0xFFD6E2F5);
-
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surfaceContainerLow,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: inputBorder, width: 1),
+        border: Border.all(color: colors.outlineVariant, width: 1),
         boxShadow: [
           BoxShadow(
-            color: primaryNavy.withValues(alpha: 0.04),
+            color: colors.shadow.withValues(alpha: 0.08),
             blurRadius: 14,
             offset: const Offset(0, 4),
           ),
@@ -53,12 +46,12 @@ class SavedJobCard extends StatelessWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: paleBlueBackground,
+                        color: colors.primaryContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.work_outline_rounded,
-                        color: primaryBlue,
+                        color: colors.onPrimaryContainer,
                         size: 22,
                       ),
                     ),
@@ -69,29 +62,29 @@ class SavedJobCard extends StatelessWidget {
                         children: [
                           Text(
                             'Job Reference #${savedJob.jobId}',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: primaryNavy,
+                              color: colors.onSurface,
                               height: 1.25,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
+                          Text(
                             'Saved Position',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: secondaryText,
+                              color: colors.onSurfaceVariant,
                             ),
                           ),
                         ],
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(
+                      icon: Icon(
                         Icons.bookmark_rounded,
-                        color: primaryBlue,
+                        color: colors.primary,
                         size: 24,
                       ),
                       tooltip: 'Remove from saved jobs',
@@ -104,29 +97,37 @@ class SavedJobCard extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 6,
                   children: [
-                    _buildPill(icon: Icons.tag_rounded, label: savedJob.jobId),
-                    _buildPill(icon: Icons.bookmark_added_outlined, label: 'Bookmarked'),
+                    _buildPill(
+                      context,
+                      icon: Icons.tag_rounded,
+                      label: savedJob.jobId,
+                    ),
+                    _buildPill(
+                      context,
+                      icon: Icons.bookmark_added_outlined,
+                      label: 'Bookmarked',
+                    ),
                   ],
                 ),
                 const SizedBox(height: 14),
-                const Divider(height: 1, color: inputBorder),
+                Divider(height: 1, color: colors.outlineVariant),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'ID: ${savedJob.id}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: mutedText,
+                        color: colors.onSurfaceVariant,
                       ),
                     ),
                     Text(
                       'Saved ${_formatDate(savedJob.savedAt)}',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 11,
-                        color: mutedText,
+                        color: colors.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -140,24 +141,29 @@ class SavedJobCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPill({required IconData icon, required String label}) {
+  Widget _buildPill(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+  }) {
+    final colors = Theme.of(context).colorScheme;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: paleBlueBackground,
+        color: colors.secondaryContainer,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: primaryNavy),
+          Icon(icon, size: 13, color: colors.onSecondaryContainer),
           const SizedBox(width: 5),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w600,
-              color: primaryNavy,
+              color: colors.onSecondaryContainer,
             ),
           ),
         ],

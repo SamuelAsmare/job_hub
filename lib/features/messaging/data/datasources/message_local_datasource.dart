@@ -1,4 +1,3 @@
-
 import '../../domain/models/conversation.dart';
 import '../../domain/models/message.dart';
 
@@ -11,6 +10,38 @@ class MessageLocalDataSource {
 
   final List<Conversation> _conversations;
   final List<Message> _messages;
+
+  Future<Conversation> getOrCreateConversation({
+    required String currentUserId,
+    required String currentUserName,
+    required String otherUserId,
+    required String otherUserName,
+  }) async {
+    if (currentUserId.trim().isEmpty || otherUserId.trim().isEmpty) {
+      throw ArgumentError('Conversation participants must have user IDs.');
+    }
+    if (currentUserId == otherUserId) {
+      throw ArgumentError('A conversation requires two different users.');
+    }
+
+    for (final conversation in _conversations) {
+      final isSamePair = (conversation.participantOneId == currentUserId &&
+              conversation.participantTwoId == otherUserId) ||
+          (conversation.participantOneId == otherUserId &&
+              conversation.participantTwoId == currentUserId);
+      if (isSamePair) return conversation;
+    }
+
+    final conversation = Conversation(
+      id: 'conversation_${DateTime.now().microsecondsSinceEpoch}',
+      participantOneId: currentUserId,
+      participantTwoId: otherUserId,
+      participantOneName: currentUserName,
+      participantTwoName: otherUserName,
+    );
+    _conversations.add(conversation);
+    return conversation;
+  }
 
   Future<List<Conversation>> getConversations(String userId) async {
     final conversations = _conversations

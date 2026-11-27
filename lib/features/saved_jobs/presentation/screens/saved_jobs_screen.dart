@@ -15,29 +15,19 @@ class SavedJobsScreen extends ConsumerWidget {
   static const String routePath = '/saved-jobs';
   static const String routeName = 'saved-jobs';
 
-  static const Color primaryNavy = Color(0xFF14264F);
-  static const Color primaryBlue = Color(0xFF286BE8);
-  static const Color accentCyan = Color(0xFF50CBE0);
-  static const Color paleBlueBackground = Color(0xFFEAF2FF);
-  static const Color secondaryText = Color(0xFF536584);
-  static const Color mutedText = Color(0xFF7485A3);
-  static const Color inputBorder = Color(0xFFD6E2F5);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final savedJobsAsync = ref.watch(savedJobsProvider);
+    final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [
-              paleBlueBackground,
-              Colors.white,
-            ],
-            stops: [0.0, 0.30],
+            colors: [colors.surfaceContainerLow, colors.surface],
+            stops: const [0.0, 0.30],
           ),
         ),
         child: SafeArea(
@@ -47,20 +37,19 @@ class SavedJobsScreen extends ConsumerWidget {
               _buildHeader(context),
               Expanded(
                 child: savedJobsAsync.when(
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      color: primaryBlue,
-                    ),
+                  loading: () => Center(
+                    child: CircularProgressIndicator(color: colors.primary),
                   ),
-                  error: (error, stack) => _buildErrorState(context, ref, error),
+                  error: (error, stack) =>
+                      _buildErrorState(context, ref, error),
                   data: (savedJobs) {
                     if (savedJobs.isEmpty) {
                       return _buildEmptyState(context);
                     }
 
                     return RefreshIndicator(
-                      color: primaryBlue,
-                      backgroundColor: Colors.white,
+                      color: colors.primary,
+                      backgroundColor: colors.surface,
                       onRefresh: () async {
                         await ref.read(savedJobsProvider.notifier).refresh();
                       },
@@ -90,7 +79,7 @@ class SavedJobsScreen extends ConsumerWidget {
                                       'Job removed from saved list',
                                       style: TextStyle(fontSize: 13),
                                     ),
-                                    backgroundColor: primaryNavy,
+                                    backgroundColor: colors.inverseSurface,
                                     behavior: SnackBarBehavior.floating,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -115,6 +104,7 @@ class SavedJobsScreen extends ConsumerWidget {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Padding(
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 12),
       child: Column(
@@ -136,54 +126,54 @@ class SavedJobsScreen extends ConsumerWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surfaceContainerHigh,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: inputBorder, width: 1),
+                    border: Border.all(color: colors.outlineVariant, width: 1),
                     boxShadow: [
                       BoxShadow(
-                        color: primaryNavy.withValues(alpha: 0.05),
+                        color: colors.shadow.withValues(alpha: 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_back_ios_new_rounded,
                     size: 16,
-                    color: primaryNavy,
+                    color: colors.onSurface,
                   ),
                 ),
               ),
               const SizedBox(width: 14),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'JOB SEEKER',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: primaryBlue,
+                    color: colors.primary,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Saved Jobs',
             style: TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              color: primaryNavy,
+              color: colors.onSurface,
               height: 1.15,
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
+          Text(
             'Review and manage your bookmarked opportunities',
             style: TextStyle(
               fontSize: 13,
-              color: secondaryText,
+              color: colors.onSurfaceVariant,
             ),
           ),
         ],
@@ -192,6 +182,7 @@ class SavedJobsScreen extends ConsumerWidget {
   }
 
   Widget _buildEmptyState(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -202,33 +193,33 @@ class SavedJobsScreen extends ConsumerWidget {
               width: 80,
               height: 80,
               decoration: BoxDecoration(
-                color: paleBlueBackground,
+                color: colors.primaryContainer,
                 shape: BoxShape.circle,
-                border: Border.all(color: inputBorder, width: 1.5),
+                border: Border.all(color: colors.outlineVariant, width: 1.5),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.bookmark_border_rounded,
-                color: primaryBlue,
+                color: colors.onPrimaryContainer,
                 size: 38,
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'No Saved Jobs Yet',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: primaryNavy,
+                color: colors.onSurface,
               ),
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'Bookmark job openings while browsing to keep track of opportunities and apply whenever you are ready.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: secondaryText,
+                color: colors.onSurfaceVariant,
                 height: 1.5,
               ),
             ),
@@ -253,7 +244,7 @@ class SavedJobsScreen extends ConsumerWidget {
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primaryBlue,
+                  backgroundColor: colors.primary,
                   foregroundColor: Colors.white,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
@@ -270,6 +261,7 @@ class SavedJobsScreen extends ConsumerWidget {
   }
 
   Widget _buildErrorState(BuildContext context, WidgetRef ref, Object error) {
+    final colors = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -279,31 +271,31 @@ class SavedJobsScreen extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: colors.errorContainer,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.error_outline_rounded,
-                color: Colors.red.shade400,
+                color: colors.error,
                 size: 36,
               ),
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Unable to load saved jobs',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: primaryNavy,
+                color: colors.onSurface,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               error.toString(),
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
-                color: secondaryText,
+                color: colors.onSurfaceVariant,
               ),
             ),
             const SizedBox(height: 20),
@@ -312,7 +304,7 @@ class SavedJobsScreen extends ConsumerWidget {
               icon: const Icon(Icons.refresh_rounded, size: 16),
               label: const Text('Try Again'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: primaryBlue,
+                backgroundColor: colors.primary,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),

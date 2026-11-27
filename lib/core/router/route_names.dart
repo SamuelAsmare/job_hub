@@ -28,6 +28,9 @@ class RouteNames {
   static const String applyJob = '/jobs/:jobId/apply';
   static const String applyJobName = 'apply-job';
 
+  static const String startConversation = '/jobs/:jobId/message';
+  static const String startConversationName = 'start-conversation';
+
   static const String myApplications = '/applications';
   static const String myApplicationsName = 'my-applications';
 
@@ -71,6 +74,8 @@ class RouteNames {
   static String jobDetailsPath(String jobId) => '/jobs/$jobId';
 
   static String applyJobPath(String jobId) => '/jobs/$jobId/apply';
+
+  static String startConversationPath(String jobId) => '/jobs/$jobId/message';
 
   static String chatPath(String conversationId) => '/messages/$conversationId';
 

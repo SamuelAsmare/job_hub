@@ -10,7 +10,10 @@ class NotificationTypeBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (label, icon, color, bgColor) = _getTypeDetails(type);
+    final (label, icon, color, bgColor) = _getTypeDetails(
+      Theme.of(context).colorScheme,
+      type,
+    );
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -37,35 +40,38 @@ class NotificationTypeBadge extends StatelessWidget {
     );
   }
 
-  static (String, IconData, Color, Color) _getTypeDetails(String type) {
+  static (String, IconData, Color, Color) _getTypeDetails(
+    ColorScheme colors,
+    String type,
+  ) {
     switch (type.toLowerCase()) {
       case 'application_status':
         return (
           'Application',
           Icons.assignment_turned_in_outlined,
-          const Color(0xFF286BE8),
-          const Color(0xFFEAF2FF),
+          colors.onPrimaryContainer,
+          colors.primaryContainer,
         );
       case 'message':
         return (
           'Message',
           Icons.chat_bubble_outline_rounded,
-          const Color(0xFF14264F),
-          const Color(0xFFEAF2FF),
+          colors.onTertiaryContainer,
+          colors.tertiaryContainer,
         );
       case 'job_alert':
         return (
           'Job Alert',
           Icons.notifications_active_outlined,
-          const Color(0xFF0097A7),
-          const Color(0xFFE0F7FA),
+          colors.onSecondaryContainer,
+          colors.secondaryContainer,
         );
       default:
         return (
           'Update',
           Icons.info_outline_rounded,
-          const Color(0xFF536584),
-          const Color(0xFFF1F4F9),
+          colors.onSurfaceVariant,
+          colors.surfaceContainerHigh,
         );
     }
   }

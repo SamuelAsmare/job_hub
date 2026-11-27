@@ -44,6 +44,20 @@ class MessageActions {
 
   final MessageRepository _repository;
 
+  Future<Conversation> getOrCreateConversation({
+    required String currentUserId,
+    required String currentUserName,
+    required String otherUserId,
+    required String otherUserName,
+  }) {
+    return _repository.getOrCreateConversation(
+      currentUserId: currentUserId,
+      currentUserName: currentUserName,
+      otherUserId: otherUserId,
+      otherUserName: otherUserName,
+    );
+  }
+
   Future<void> sendMessage(Message message) {
     return _repository.sendMessage(message);
   }
